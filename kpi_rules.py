@@ -67,10 +67,14 @@ def reporting_period_rows(rows, date_key, start, end):
 
 def format_percentage(value):
     """Compact display; the unrounded value remains the decision input."""
-    return "—" if value is None else f"{value:.2f}".rstrip("0").rstrip(".") + "%"
+    if value is None:
+        return "—"
+    if value < 100 and round(value, 2) == 100:
+        return "<100%"
+    return f"{value:.2f}".rstrip("0").rstrip(".") + "%"
 
 
-def checklist_conformance(audits):
+def checklist_conformance(audits, *, rounded=True):
     """Yes / (Yes + No) for applicable scored checklist questions.
 
     The illustrative demo criteria explicitly fails an entire permit for one No in
@@ -79,7 +83,10 @@ def checklist_conformance(audits):
     answers=[str(row.get("response", "")).lower()
              for audit in audits for row in audit.get("responses", [])
              if str(row.get("response", "")).lower() in {"yes", "no"}]
-    return None if not answers else round(100 * answers.count("yes") / len(answers))
+    if not answers:
+        return None
+    percentage = 100 * answers.count("yes") / len(answers)
+    return round(percentage) if rounded else percentage
 
 
 def permit_auditor_role(audit, role_map):
