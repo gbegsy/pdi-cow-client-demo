@@ -150,6 +150,28 @@ st.markdown("""
 .kpi.red{border-color:#bd3d43}
 .kpi.review{border-color:#69879b}
 
+
+/* Fixed internal rows keep every KPI card and status badge aligned. */
+.kpi{
+ height:540px!important;min-height:540px;display:grid;
+ grid-template-rows:14px 60px 192px 24px 56px minmax(72px,1fr);
+ gap:8px;padding:16px;box-sizing:border-box;align-content:stretch
+}
+.kpi .kt,.kpi .ks,.kpi .metric-pair,.kpi .rag-reason,.kpi .kd{margin:0}
+.kpi .ks{min-height:0}
+.kpi .metric-pair{display:grid;grid-template-rows:112px 72px;gap:8px}
+.kpi .metric-line{min-height:0}
+.kpi .metric-line span{min-height:28px}
+.kpi .metric-line strong{min-height:0;font-size:18px;line-height:1.25}
+.kpi .badge{align-self:start;justify-self:start}
+.kpi .rag-reason{min-height:0}
+.kpi .kd{padding-top:8px;align-self:stretch;overflow-wrap:anywhere}
+@media(max-width:650px){
+ .kpi{height:auto!important;min-height:0;display:flex;gap:10px}
+ .kpi .ks,.kpi .metric-line span{min-height:0}
+ .kpi .metric-pair{display:grid;grid-template-rows:auto auto;gap:10px}
+}
+
 </style>
 """, unsafe_allow_html=True)
 
