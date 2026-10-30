@@ -118,29 +118,29 @@ st.markdown("""
 
 
 /* Prominent dashboard review navigation. */
-[data-testid="stTabs"] [data-baseweb="tab-list"]{
+[role="tablist"]{
  gap:8px;padding:10px;background:#edf3f8;border:1px solid #cbd9e5;
  border-radius:12px;flex-wrap:wrap;height:auto
 }
-[data-testid="stTabs"] button[data-baseweb="tab"]{
+[role="tab"]{
  background:#fff;border:1px solid #b8cbdc;border-radius:8px;
  padding:11px 16px;min-height:48px;height:auto;color:#15394f;font-weight:700
 }
-[data-testid="stTabs"] button[data-baseweb="tab"] p{
+[role="tab"] p{
  font-size:15px;font-weight:700
 }
-[data-testid="stTabs"] button[data-baseweb="tab"]:hover{
+[role="tab"]:hover{
  background:#dcebf5;border-color:#2c719c;color:#102f4b
 }
-[data-testid="stTabs"] button[data-baseweb="tab"][aria-selected="true"]{
+[role="tab"][aria-selected="true"]{
  background:#102f4b;border-color:#102f4b;color:#fff;
  box-shadow:0 2px 5px #102f4b25
 }
-[data-testid="stTabs"] button[data-baseweb="tab"]:focus-visible{
+[role="tab"]:focus-visible{
  outline:3px solid #1684c1;outline-offset:3px
 }
-[data-testid="stTabs"] [data-baseweb="tab-highlight"],
-[data-testid="stTabs"] [data-baseweb="tab-border"]{display:none}
+[data-baseweb="tab-highlight"],
+[data-baseweb="tab-border"]{display:none}
 
 </style>
 """, unsafe_allow_html=True)
