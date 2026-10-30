@@ -939,25 +939,29 @@ def dashboard():
                 aa=[a for a in permit+tbt+lead if a["auditor"]==n]; rr.append({"Auditor / Leader":n,"Audits completed":len(aa),"Average conformance %":format_percentage(average_audit_conformance(aa)).removesuffix("%"),"Whole-audit conformance %":format_percentage(audit_conformance(aa,rounded=False)).removesuffix("%"),"Sites / Teams":", ".join(sorted({a["site"] for a in aa if a["site"]}))})
             st.dataframe(pd.DataFrame(rr),use_container_width=True,hide_index=True) if rr else st.info("No auditor data.")
             if rr:
-                selected_auditor=st.selectbox("Auditor / Leader for BAR failures",[row["Auditor / Leader"] for row in rr],key="bar-failure-auditor")
+                with st.expander("What do the BAR levels mean?"):
+                    st.markdown("**BAR — Barrier Assurance Review.** Each audit question has a preset classification. A **No** records a non-conformance against that question. The BAR identifies the type of control being checked; it is not a separate score assigned to the finding.")
+                    st.markdown("**BAR 1 · Critical control verification:** checks a required control against major accident or serious harm. A No requires immediate action to make work safe.\n\n**BAR 2 · Operational control:** checks planning, understanding, supervision or how work is carried out. A No requires correction and tracking.\n\n**BAR 3 · Management and learning:** checks oversight, records, lessons or improvement follow-up. A No requires an improvement action.")
+                    st.caption("These are the demonstration definitions; question classifications require agreement before operational use.")
+                selected_auditor=st.selectbox("Auditor / Leader for BAR non-conformances",[row["Auditor / Leader"] for row in rr],key="bar-failure-auditor")
                 bar_context=(period,asset,site,selected_auditor)
-                if st.button("Show BAR failures",key="show-auditor-bar-failures",type="primary"):
+                if st.button("Show BAR non-conformances",key="show-auditor-bar-failures",type="primary"):
                     st.session_state["_auditor_bar_context"]=bar_context
                 if st.session_state.get("_auditor_bar_context")==bar_context:
                     failed=auditor_bar_failures(permit+tbt+lead,selected_auditor)
-                    st.markdown(f"#### BAR failures · {selected_auditor}")
+                    st.markdown(f"#### BAR non-conformances · {selected_auditor}")
                     st.caption(f"{len(failed)} failed questions across {len({row['Audit ID'] for row in failed})} audits · selected month and filters.")
                     if failed:
                         count_columns=st.columns(3)
                         for column,bar in zip(count_columns,["BAR 1","BAR 2","BAR 3"]):
-                            column.metric(bar+" failures",sum(row["BAR"]==bar for row in failed))
+                            column.metric(bar+" non-conformances",sum(row["BAR"]==bar for row in failed))
                         for bar in ["BAR 1","BAR 2","BAR 3","Unrated"]:
                             records=[row for row in failed if row["BAR"]==bar or (bar=="Unrated" and row["BAR"] not in {"BAR 1","BAR 2","BAR 3","Unrated"})]
                             if records:
                                 with st.expander(f"{bar} · {len(records)} failed questions",expanded=bar=="BAR 1"):
                                     st.dataframe(pd.DataFrame(records),use_container_width=True,hide_index=True)
                     else:
-                        st.success("No failed BAR questions for this auditor in the selected view.")
+                        st.success("No BAR non-conformances for this auditor in the selected view.")
 
         with tabs[6]:
             st.subheader("KPI 5 · Company-wide Incident Register incident summary"); a,b,c=st.columns(3); current=a.number_input("Rolling 12-month permit-controlled incidents",0,999,0); prev=b.number_input("Previous rolling 12-month incidents",0,999,0); hipo=c.number_input("HiPO events",0,999,0); a,b,c=st.columns(3); injury=a.number_input("Significant injuries (MTC+)",0,999,0); loc=b.number_input("Loss of Containment",0,999,0); major=c.number_input("Major Loss of Containment",0,999,0); a,b,c=st.columns(3); repeat=a.selectbox("Repeat event theme?",["No","Yes"]); recurring=b.selectbox("Recurring permit-control failure?",["No","Yes"]); sig=c.selectbox("Significant increase?",["No","Yes"],help="No numerical threshold is assumed; use the agreed management assessment."); comments=st.text_area("Incident Register source, reviewed themes and leadership actions",height=220,help="Record the source, task and root-cause themes, interpretation, accountable action owners and follow-up. Structured counts above still drive the provisional KPI.")
