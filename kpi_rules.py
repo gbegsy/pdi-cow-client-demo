@@ -66,13 +66,14 @@ def reporting_period_rows(rows, date_key, start, end):
 
 
 def format_percentage(value):
-    """Compact display; the unrounded value remains the decision input."""
+    """Round display upwards only; retain raw values for decisions."""
     if value is None:
         return "—"
-    if value < 100 and round(value, 2) == 100:
+    from math import ceil
+    shown=ceil(value)
+    if value < 100 and shown == 100:
         return "<100%"
-    return f"{value:.2f}".rstrip("0").rstrip(".") + "%"
-
+    return f"{shown}%"
 
 def checklist_conformance(audits, *, rounded=True):
     """Yes / (Yes + No) for applicable scored checklist questions.
