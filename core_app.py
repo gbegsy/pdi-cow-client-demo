@@ -358,7 +358,7 @@ def audit_conf(rows):
     return audit_conformance(rows)
 
 def q_conf(rows):
-    return checklist_conformance(rows)
+    return checklist_conformance(rows, rounded=False)
 
 def checklist_compliance_basis(rows):
     answers=[str(item.get("response", "")).strip().lower()
@@ -708,7 +708,7 @@ def dashboard():
         position=overall.upper() if len(assessed)==5 else "DATA PENDING"
         summary_label="CONTROL OF WORK OVERVIEW"
         focus="<br>".join(label+": "+", ".join(kpi_names[i] for i,x in enumerate(statuses) if x==status) for label,status in (("RED","Red"),("AMBER","Amber")) if status in statuses)
-        st.markdown(f'<div class="summary"><div class="summary-main"><span class="summary-label">{summary_label}</span><strong class="summary-value">{position}</strong><span class="summary-sub">{md.strftime("%B %Y")}<br>{focus}</span></div><div class="summary-stat"><span class="summary-label">Audits Completed</span><strong class="summary-value">{len(view)}</strong><span class="summary-sub">Selected month and asset</span></div><div class="summary-stat"><span class="summary-label">Question conformance</span><strong class="summary-value">{str(q_conf(permit+tbt+lead))+"%" if q_conf(permit+tbt+lead) is not None else "—"}</strong><span class="summary-sub">Yes of scored responses</span></div><div class="summary-stat"><span class="summary-label">Failed BAR 1 questions</span><strong class="summary-value" style="color:#bd3d43">{bar1}</strong><span class="summary-sub">Critical control verification</span></div><div class="summary-stat"><span class="summary-label">SMART actions recorded</span><strong class="summary-value">{action_recorded}/{len(action_findings)}</strong><span class="summary-sub">For No responses</span></div></div>',unsafe_allow_html=True)
+        st.markdown(f'<div class="summary"><div class="summary-main"><span class="summary-label">{summary_label}</span><strong class="summary-value">{position}</strong><span class="summary-sub">{md.strftime("%B %Y")}<br>{focus}</span></div><div class="summary-stat"><span class="summary-label">Audits Completed</span><strong class="summary-value">{len(view)}</strong><span class="summary-sub">Selected month and asset</span></div><div class="summary-stat"><span class="summary-label">Question conformance</span><strong class="summary-value">{format_percentage(q_conf(permit+tbt+lead)) if q_conf(permit+tbt+lead) is not None else "—"}</strong><span class="summary-sub">Yes of scored responses</span></div><div class="summary-stat"><span class="summary-label">Failed BAR 1 questions</span><strong class="summary-value" style="color:#bd3d43">{bar1}</strong><span class="summary-sub">Critical control verification</span></div><div class="summary-stat"><span class="summary-label">SMART actions recorded</span><strong class="summary-value">{action_recorded}/{len(action_findings)}</strong><span class="summary-sub">For No responses</span></div></div>',unsafe_allow_html=True)
         if sample_count or k5_synthetic: st.caption("Test data included — results are provisional.")
         else: st.caption("DEMO ONLY — illustrative results from generated records.")
         if quality_issues:
@@ -919,7 +919,8 @@ def dashboard():
             st.success("No negative assurance responses in this view.")
     with tabs[3]:
         from human_factors import render as render_hf_comment_themes
-        st.markdown("**CoW Assurance Insights.** Review recorded conformance, recurring gaps and requirements verified through Yes answers. These results describe the audit sample; they do not establish the causes of a gap. Whole-audit conformance fails an audit with any applicable No; question conformance measures individual answers."); c1,c2,c3=st.columns(3); c1.metric("Question conformance",f"{q_conf(permit+tbt)}%" if q_conf(permit+tbt) is not None else "—"); c2.metric("Permit whole-audit conformance",f"{audit_conf(permit)}%" if audit_conf(permit) is not None else "—"); c3.metric("TBT/POP whole-audit conformance",f"{audit_conf(tbt)}%" if audit_conf(tbt) is not None else "—")
+        st.markdown("**CoW Assurance Insights.** Review recorded conformance, recurring gaps and requirements verified through Yes answers. These results describe the audit sample; they do not establish the causes of a gap. Whole-audit conformance fails an audit with any applicable No; question conformance measures individual answers."); c1,c2,c3=st.columns(3); c1.metric("Question conformance",format_percentage(q_conf(permit+tbt))); c2.metric("Permit whole-audit conformance",format_percentage(audit_conformance(permit,rounded=False))); c3.metric("TBT/POP whole-audit conformance",format_percentage(audit_conformance(tbt,rounded=False)))
+        st.caption(checklist_compliance_basis(permit+tbt))
         st.markdown("#### Non-conformance themes for leadership review")
         st.info(nonconformance_narrative(permit+tbt))
         st.markdown("#### Controls verified by Yes responses")
