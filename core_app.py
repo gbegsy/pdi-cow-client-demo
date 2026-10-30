@@ -877,8 +877,8 @@ def dashboard():
             measure_card("KPI 5","Permit-Controlled Incidents","Rolling 12-month count",k5v,"Previous 12-month count",str(prev) if k5 else "—",k5s,k5_reason,"Synthetic UAT scenario" if k5_synthetic else "Company-wide Incident Register source required")
             with st.expander("KPI Targets & Tolerances"):
                 st.markdown("**Measure and target**\nReport incidents confirmed as occurring during permit-controlled activities over a **rolling 12-month period**, with identification of HiPOs, losses of containment and significant injuries (MTC or above). Use reviewed Incident Register records and the Incident Register tracking spreadsheet.\n\n**Green:** No increase in the rolling 12-month incident trend. No HiPOs, significant injuries (MTC or above), or repeat loss-of-containment events identified. No intervention required; continue monitoring and discussion through Monthly Operations and QSHE meetings.\n\n**Amber:** Increasing incident trend, a single HiPO, significant injury, loss of containment, or a repeat event theme identified within the reporting period. Operations Director intervention through targeted campaigns, assurance activities or focused reviews to address identified themes.\n\n**Red:** Significant increase in incidents, multiple HiPOs, significant injuries (MTC or above), major loss-of-containment events, or evidence of recurring failures in permit controls. Immediate General Manager intervention; investigation findings, learning actions and improvement measures implemented and tracked to closure.")
-        tabs=st.tabs(["Assurance Insights","Leadership Report","Findings & Actions","Auditor View","Company & Site Performance","Monthly History","KPI 5 Data"])
-        with tabs[5]:
+        tabs=st.tabs(["Assurance Insights","Leadership Report","Detailed KPI Reports","Findings & Actions","Auditor View","Company & Site Performance","Monthly History","KPI 5 Data"])
+        with tabs[6]:
             st.subheader("Monthly History")
             dated=[(a,safe_date(a["audit_date"])) for a in all_a]
             dated=[(a,d) for a,d in dated if d]
@@ -914,7 +914,7 @@ def dashboard():
                     monthly.append({"Month":month_start.strftime("%B %Y"),**history_counts(rows)})
                 st.dataframe(pd.DataFrame(monthly),use_container_width=True,hide_index=True)
                 st.caption("Monthly activity counts use eligible roles. These are activity counts, not historical KPI RAG ratings. KPI 5 is the company-wide rolling incident count.")
-        with tabs[4]:
+        with tabs[5]:
             st.subheader("Monthly performance by Site / Hub"); rows=[]
             month_permit=[a for a in month if a["form_name"]=="Control of Work: Permit Quality" and permit_auditor_role(a,pmap)=="Site Controller"]
             for g,(rw,nw) in selected_groups.items():
@@ -947,7 +947,7 @@ def dashboard():
                             history.append({"corrected_at":datetime.now().isoformat(timespec="seconds"),"source":correction_ref.strip(),"previous_site":chosen["site"],"previous_role":metadata.get("auditor_role"),"previous_category":metadata.get("permit_sample_category"),"site":corrected_site,"role":corrected_role,"category":corrected_category})
                             metadata.update(site=corrected_site,auditor_role=corrected_role,permit_sample_category=corrected_category,attribution_history=history)
                             c=db(); c.execute("UPDATE audits SET site=?,metadata=? WHERE audit_id=?",(corrected_site,json.dumps(metadata),chosen_id)); c.commit(); c.close(); st.rerun()
-        with tabs[2]:
+        with tabs[3]:
             rows=[]
             for a in permit+tbt+lead:
                 for r in a["responses"]:
@@ -1013,7 +1013,7 @@ def dashboard():
                 else: st.caption("No controls verified by a Yes response in the selected view.")
                 st.caption("Yes confirms checklist conformance; it does not by itself demonstrate exceptional practice. Non-conformances and actions remain the priority.")
             render_hf_comment_themes(permit+tbt+lead,period)
-        with tabs[3]:
+        with tabs[4]:
             from kpi_rules import average_audit_conformance
             st.subheader("Auditor results")
             st.caption("Compare audit counts, average question scores and audit pass rates. Select an auditor below to review their BAR non-conformances.")
@@ -1048,7 +1048,7 @@ def dashboard():
                     else:
                         st.success("No BAR non-conformances for this auditor in the selected view.")
 
-        with tabs[6]:
+        with tabs[7]:
             st.subheader("KPI 5 · Company-wide Incident Register incident summary"); a,b,c=st.columns(3); current=a.number_input("Rolling 12-month permit-controlled incidents",0,999,0); prev=b.number_input("Previous rolling 12-month incidents",0,999,0); hipo=c.number_input("HiPO events",0,999,0); a,b,c=st.columns(3); injury=a.number_input("Significant injuries (MTC+)",0,999,0); loc=b.number_input("Loss of Containment",0,999,0); major=c.number_input("Major Loss of Containment",0,999,0); a,b,c=st.columns(3); repeat=a.selectbox("Repeat event theme?",["No","Yes"]); recurring=b.selectbox("Recurring permit-control failure?",["No","Yes"]); sig=c.selectbox("Significant increase?",["No","Yes"],help="No numerical threshold is assumed; use the agreed management assessment."); comments=st.text_area("Incident Register source, reviewed themes and leadership actions",height=220,help="Record the source, task and root-cause themes, interpretation, accountable action owners and follow-up. Structured counts above still drive the provisional KPI.")
             if st.button("Save KPI 5 result",type="primary"):
                 if not comments.strip():st.error("Record the Incident Register tracking source and validation note before saving.")
@@ -1057,32 +1057,35 @@ def dashboard():
         with tabs[1]:
             from monthly_report import report_controls
             report_controls(db,monthly_report,asset+" / "+site,k5s)
-    with st.expander("Detailed KPI evidence, delivery and accountability",expanded=False):
-        st.markdown('<div class="section-head">KPI 3 – Monthly and Three-month View</div>',unsafe_allow_html=True)
-        st.dataframe(pd.DataFrame(k3_month_rows),use_container_width=True,hide_index=True)
-        st.caption(f"Q{q} {y}: {k3n}/3 eligible engagements through {md.strftime('%B')}; quarter engagement conformance {format_percentage(k3c) if k3c is not None else '—'}; coverage {gov['kpi3_coverage']}. Monthly rows show contributions, while the RAG rating applies to the three-month quarter. Future months in the selected quarter are blank.")
-        with st.sidebar.expander("How the provisional position is calculated"):
-            st.markdown("The provisional position shows the most adverse assessed KPI. It remains a demonstration indicator while source checks are incomplete. KPI 1 and KPI 2 use whole-permit conformance: one failed checklist item fails that permit audit, regardless of the question's preset BAR. Question BARs determine each form's result. KPI 3 uses eligible leadership engagement completion and whole-engagement conformance, with Remote Site coverage checked against Visit Register.")
-        st.subheader("Weekly Site Controller delivery")
-        weekly_rows=[]
-        for group,(routine_target,new_target) in selected_groups.items():
-            if site!="All" and group!=site: continue
-            for category,target in (("Routine",routine_target),("Non-routine",new_target)):
-                records=[a for a in sc_samples if a["site"]==group and permit_type(a)==category]
-                met,planned=weekly_coverage(records,y,m,target)
-                weekly_rows.append({"Site / Hub":group,"Sample category":category,"Weekly target":target,"Weeks target met":met,"Weeks planned":planned,"Weeks below target":planned-met,"Recorded auditors":", ".join(sorted({a["auditor"] for a in records})),"Accountable role":"Site Controller / Site Leadership"})
-        st.dataframe(pd.DataFrame(weekly_rows),use_container_width=True,hide_index=True)
-        st.subheader("Accountability and required response")
-        account=[]
-        for i,(status,owner) in enumerate(zip(statuses,["Site Leadership","Operations Director","General Manager","Site Leadership / Operations Director","Operations Director"])):
-            if status!="Green":
-                account.append({"KPI":f"KPI {i+1}","Status":status,"Accountable role":owner,"Required response":"Validate source / target allocation" if status not in ("Red","Amber") else "Immediate intervention; actions within one month" if status=="Red" and i<4 else "Review performance and agree follow-up actions"})
-        if account: st.dataframe(pd.DataFrame(account),use_container_width=True,hide_index=True)
-        st.caption("Role accountability is shown above. Finding owners and due dates are in Findings & Actions. Named missed obligations require an approved rota/target allocation; recorded auditors alone do not establish who was due to audit.")
-        from leadership_views import render as render_leadership_details
-        detail_groups={g:v for g,v in selected_groups.items() if site=="All" or g==site}
-        detail_tbt=[a for a in tbt if a["site"] in {"North Remote Sites","South Remote Sites"} and tbt_auditor_role(a,tmap) in {"Operations Supervisor","HSE Adviser","Site Manager"}]
-        render_leadership_details(db,recovery_actions,period,asset+" / "+site,y,m,detail_groups,sc_samples,as_samples,qlead,detail_tbt,tmap,statuses,{"all_a":all_a,"pmap":pmap,"monthly_report":monthly_report})
+
+        with tabs[2]:
+            st.caption("Select a KPI below to review delivery, conformance, findings, targets and leadership actions.")
+            from leadership_views import render as render_leadership_details
+            detail_groups={g:v for g,v in selected_groups.items() if site=="All" or g==site}
+            detail_tbt=[a for a in tbt if a["site"] in {"North Remote Sites","South Remote Sites"} and tbt_auditor_role(a,tmap) in {"Operations Supervisor","HSE Adviser","Site Manager"}]
+            render_leadership_details(db,recovery_actions,period,asset+" / "+site,y,m,detail_groups,sc_samples,as_samples,qlead,detail_tbt,tmap,statuses,{"all_a":all_a,"pmap":pmap,"monthly_report":monthly_report})
+            with st.expander("Supporting delivery and accountability tables",expanded=False):
+                st.markdown('<div class="section-head">KPI 3 – Monthly and Three-month View</div>',unsafe_allow_html=True)
+                st.dataframe(pd.DataFrame(k3_month_rows),use_container_width=True,hide_index=True)
+                st.caption(f"Q{q} {y}: {k3n}/3 eligible engagements through {md.strftime('%B')}; quarter engagement conformance {format_percentage(k3c) if k3c is not None else '—'}; coverage {gov['kpi3_coverage']}. Monthly rows show contributions, while the RAG rating applies to the three-month quarter. Future months in the selected quarter are blank.")
+                with st.sidebar.expander("How the provisional position is calculated"):
+                    st.markdown("The provisional position shows the most adverse assessed KPI. It remains a demonstration indicator while source checks are incomplete. KPI 1 and KPI 2 use whole-permit conformance: one failed checklist item fails that permit audit, regardless of the question's preset BAR. Question BARs determine each form's result. KPI 3 uses eligible leadership engagement completion and whole-engagement conformance, with Remote Site coverage checked against Visit Register.")
+                st.subheader("Weekly Site Controller delivery")
+                weekly_rows=[]
+                for group,(routine_target,new_target) in selected_groups.items():
+                    if site!="All" and group!=site: continue
+                    for category,target in (("Routine",routine_target),("Non-routine",new_target)):
+                        records=[a for a in sc_samples if a["site"]==group and permit_type(a)==category]
+                        met,planned=weekly_coverage(records,y,m,target)
+                        weekly_rows.append({"Site / Hub":group,"Sample category":category,"Weekly target":target,"Weeks target met":met,"Weeks planned":planned,"Weeks below target":planned-met,"Recorded auditors":", ".join(sorted({a["auditor"] for a in records})),"Accountable role":"Site Controller / Site Leadership"})
+                st.dataframe(pd.DataFrame(weekly_rows),use_container_width=True,hide_index=True)
+                st.subheader("Accountability and required response")
+                account=[]
+                for i,(status,owner) in enumerate(zip(statuses,["Site Leadership","Operations Director","General Manager","Site Leadership / Operations Director","Operations Director"])):
+                    if status!="Green":
+                        account.append({"KPI":f"KPI {i+1}","Status":status,"Accountable role":owner,"Required response":"Validate source / target allocation" if status not in ("Red","Amber") else "Immediate intervention; actions within one month" if status=="Red" and i<4 else "Review performance and agree follow-up actions"})
+                if account: st.dataframe(pd.DataFrame(account),use_container_width=True,hide_index=True)
+                st.caption("Role accountability is shown above. Finding owners and due dates are in Findings & Actions. Named missed obligations require an approved rota/target allocation; recorded auditors alone do not establish who was due to audit.")
 
 st.caption("**DEMO ONLY · Fictional data · Temporary session · Do not enter confidential information**")
 import importlib, demo_audits
