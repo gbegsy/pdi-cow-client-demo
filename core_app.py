@@ -14,9 +14,9 @@ from kpi_rules import reporting_weeks, presentation_visit_status, audit_conforma
 BASE = Path(__file__).parent
 DATA = json.loads((BASE / "questions.json").read_text(encoding="utf-8"))
 import tempfile
-if st.session_state.get("_client_demo_scenario") != "conformance-75-83-v2":
+if st.session_state.get("_client_demo_scenario") != "conformance-75-83-v3":
     st.session_state["client_demo_dir"] = tempfile.mkdtemp(prefix="pdi-cow-client-demo-")
-    st.session_state["_client_demo_scenario"] = "conformance-75-83-v2"
+    st.session_state["_client_demo_scenario"] = "conformance-75-83-v3"
 DB = Path(st.session_state["client_demo_dir"]) / "demo.db"
 # Standalone demo: never read deployment secrets or external database settings.
 DATABASE_URL = ""
@@ -956,8 +956,10 @@ def dashboard():
     render_leadership_details(db,recovery_actions,period,asset+" / "+site,y,m,detail_groups,sc_samples,as_samples,qlead,detail_tbt,tmap,statuses,{"all_a":all_a,"pmap":pmap,"monthly_report":monthly_report})
 
 st.warning("DEMO ONLY — fictional sites, people, audits and incidents. The sample deliberately concentrates failed checks in a minority of audits to demonstrate conformance around 75–83%. Sample KPI targets and BAR classifications illustrate the model and require client agreement before operational use. Do not enter confidential information. Data is temporary and isolated for this session.")
-from demo_audits import prepare as prepare_demo
-prepare_demo(db, DATA, SITE_GROUPS)
+import importlib, demo_audits
+if demo_audits.SCENARIO != "september-conformance-75-83-v2":
+    importlib.reload(demo_audits)
+demo_audits.prepare(db, DATA, SITE_GROUPS)
 st.sidebar.markdown("### PDi | VERIFY Demo")
 page=st.sidebar.radio("Navigation",["Dashboard","Permit Quality","Toolbox Talk / Permit / POP","Leadership Engagement","Submitted Audits","Dashboard Export"],label_visibility="collapsed")
 
