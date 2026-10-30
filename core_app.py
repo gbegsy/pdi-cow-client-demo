@@ -377,28 +377,36 @@ def checklist_nonconformance_basis(rows):
     return f"{no} No / {yes+no} applicable answers · N/A excluded"
 
 def nonconformance_narrative(rows):
-    findings=[]
-    themes={"Permit and authorisation":("permit","authoris","wcc","certificate"),"Hazard and risk assessment":("hazard","risk","tra","assessment"),"Control implementation":("control","isolation","gas test","barrier"),"Toolbox Talk and understanding":("toolbox","tbt","understand","personnel"),"Procedures and documents":("procedure","pop","document","current approved"),"Supervision and monitoring":("supervis","monitor","site controller","inspection")}
-    counts={k:0 for k in themes}; bars={}
-    for a in rows:
-        for r in a["responses"]:
-            if str(r.get("response","")).lower()!="no":continue
-            q=str(r.get("question","")).strip(); findings.append(q); bar=r.get("bar_rating") or "Unrated"; bars[bar]=bars.get(bar,0)+1; low=q.lower()
-            matched=False
-            for theme,words in themes.items():
-                if any(w in low for w in words):counts[theme]+=1; matched=True; break
-            if not matched:counts.setdefault("Other assurance controls",0); counts["Other assurance controls"]+=1
-    if not findings:return "No failed scored questions were recorded in the selected view."
-    ranked=[(k,v) for k,v in sorted(counts.items(),key=lambda x:x[1],reverse=True) if v]
-    lead=", ".join(f"{k} ({v})" for k,v in ranked[:3]); bar_text=", ".join(f"{k}: {v}" for k,v in sorted(bars.items()))
-    repeated=pd.Series(findings).value_counts(); repeats=[f"{q} ({n})" for q,n in repeated.items() if n>1]
-    text=f"The selected audits contain **{len(findings)} No response{'s' if len(findings)!=1 else ''}**. The main variance themes are **{lead}**. Preset question BARs: **{bar_text}**."
-    if repeats:text+=f" Repeated questions include **{'; '.join(repeats[:3])}**, indicating a potential recurring gap between the expected process and field implementation."
-    else:text+=" No individual question is repeated yet; the findings currently indicate isolated control gaps rather than a confirmed recurring pattern."
-    if bars.get("BAR 1",0):text+=f" **Leadership focus:** {bars['BAR 1']} failed BAR 1 question{'s' if bars['BAR 1']!=1 else ''} require immediate confirmation that critical controls remain effective, with accountable actions and timely close-out."
-    elif bars.get("BAR 2",0):text+=" **Leadership focus:** verify that the identified operational-control weaknesses are corrected, check whether they occur at other sites and monitor closure through the next assurance cycle."
-    else:text+=" **Leadership focus:** address the supporting-control gaps through normal action management and monitor for recurrence before escalation is considered."
-    return text
+    """Plain-language CoW summary from recorded failed checks."""
+    findings=[]; failed_audits=0; bars={}; counts={}
+    themes={"Permit and authorisation":("permit","authoris","wcc","certificate"),
+            "Hazard and risk assessment":("hazard","risk","tra","assessment"),
+            "Control implementation":("control","isolation","gas test","barrier"),
+            "Toolbox Talk and understanding":("toolbox","tbt","understand","personnel"),
+            "Procedures and documents":("procedure","pop","document","current approved"),
+            "Supervision and monitoring":("supervis","monitor","site controller","inspection")}
+    for audit in rows:
+        failed=[r for r in audit.get("responses",[]) if str(r.get("response","")).strip().lower()=="no"]
+        if failed: failed_audits+=1
+        for row in failed:
+            question=str(row.get("question","")).strip()
+            findings.append(question)
+            bar=row.get("bar_rating") or "Unrated"; bars[bar]=bars.get(bar,0)+1
+            theme=next((name for name,words in themes.items() if any(word in question.lower() for word in words)),"Other CoW checks")
+            counts[theme]=counts.get(theme,0)+1
+    if not findings:
+        return "**What audits found:** No failed questions in this selection.\n\n**Next step:** Continue planned assurance and check that important work activities are covered. This result describes the audit sample."
+    bar_text=", ".join(f"{name}: {count}" for name,count in sorted(bars.items()))
+    areas=", ".join(f"{name} ({count})" for name,count in sorted(counts.items(),key=lambda item:item[1],reverse=True)[:3])
+    repeated=sum(count>1 for count in __import__("collections").Counter(findings).values())
+    repeat_note=f"{repeated} question(s) failed more than once." if repeated else "No question has failed more than once in this selection."
+    if bars.get("BAR 1"):
+        next_step="Confirm work was made safe and the required critical controls were restored. Assign an owner and due date, then verify the correction."
+    else:
+        next_step="Use Findings & Actions to confirm an owner and due date for each gap. Check the correction through a follow-up audit."
+    return (f"**What audits found:** {len(findings)} failed question(s) across {failed_audits} audit(s). {bar_text}.\n\n"
+            f"**CoW checks needing attention:** {areas}. {repeat_note}\n\n"
+            f"**Next step:** {next_step}")
 
 def permit_type(a):
     return permit_sample_category(a)
@@ -892,9 +900,10 @@ def dashboard():
                 st.success("No negative assurance responses in this view.")
         with tabs[0]:
             from human_factors import render as render_hf_comment_themes
-            st.markdown("**CoW Assurance Insights.** Review recorded conformance, recurring gaps and requirements verified through Yes answers. These results describe the audit sample; they do not establish the causes of a gap. Whole-audit conformance fails an audit with any applicable No; question conformance measures individual answers."); c1,c2,c3=st.columns(3); c1.metric("Question conformance",format_percentage(q_conf(permit+tbt))); c2.metric("Permit whole-audit conformance",format_percentage(audit_conformance(permit,rounded=False))); c3.metric("TBT/POP whole-audit conformance",format_percentage(audit_conformance(tbt,rounded=False)))
+            st.markdown("**CoW Assurance Insights.** See what the audits found, which work-control checks need attention and what to do next."); c1,c2,c3=st.columns(3); c1.metric("Question conformance",format_percentage(q_conf(permit+tbt))); c2.metric("Permit whole-audit conformance",format_percentage(audit_conformance(permit,rounded=False))); c3.metric("TBT/POP whole-audit conformance",format_percentage(audit_conformance(tbt,rounded=False)))
             st.caption(checklist_compliance_basis(permit+tbt))
-            st.markdown("#### Non-conformance themes for leadership review")
+            st.caption("Question conformance measures individual Yes/No answers. An audit meets the standard only when it has no No answers. Themes group the failed checks; they do not establish causes or the condition of every barrier.")
+            st.markdown("#### What needs attention")
             st.info(nonconformance_narrative(permit+tbt))
             with st.expander("Controls verified by Yes responses",expanded=False):
                 st.markdown("#### Controls verified by Yes responses")
