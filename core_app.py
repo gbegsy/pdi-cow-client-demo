@@ -680,7 +680,7 @@ def dashboard():
     if not month_visits and verified_status not in ("Red",):verified_status="Needs review"
     monthly_report["statuses"][3]=verified_status
     monthly_report["kpis"][3].update(Status=verified_status,Delivery=f"Verified visit weeks: Supervisor {verified_oo}/{verified_plan}; HSE Adviser {verified_med}/{verified_plan}; Site Manager {verified_oim}/1 quarter")
-    monthly_report["issues"].append("KPI 4 uses recorded Visit Register visits plus saved Site Manager coverage, findings and justification reviews. Audit-week counts are supporting evidence only. Demo HSE Adviser 50–74% band is unspecified and requires review unless another Red trigger applies.")
+    monthly_report["issues"].append("KPI 4 uses recorded Visit Register visits plus saved Site Manager coverage, findings and justification reviews. Audit-week counts are supporting evidence only. Sample targets are illustrative and require client agreement.")
     # Demo KPI 3 Amber includes isolated non-conformances and recurring minor themes.
     if any(str(r.get("response","")).lower()=="no" for a in monthly_report["datasets"][2] for r in a["responses"]) and monthly_report["statuses"][2]=="Green":
         monthly_report["statuses"][2]="Amber";monthly_report["kpis"][2]["Status"]="Amber"
