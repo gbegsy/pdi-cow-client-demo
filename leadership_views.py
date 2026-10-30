@@ -245,7 +245,7 @@ def report_week_matrix(records,groups,year,month):
 def render(db, recovery, period, scope, year, month, groups, sc, asc, qlead, tbt, tmap, statuses, measures):
     schema(db)
     report_styles()
-    st.subheader('Leadership report')
+    st.subheader('KPI 1–5 Detailed Reports')
     st.caption('Reporting weeks start on Monday and include the opening week intersecting the month, ending at the selected month end. September 2026 therefore uses WK36–40, from 31 August to 30 September. Headline plans and weekly matrices use the same basis; an opening-week record can appear in two monthly views and monthly totals must not be added as unique annual activity.')
     titles=['KPI 1 · Site Controller','KPI 2 · Asset Superintendent','KPI 3 · Leadership engagements','KPI 4 · Site Leadership Remote Site','KPI 5 · Incidents']
     tabs=st.tabs(titles)
