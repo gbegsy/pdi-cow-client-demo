@@ -144,7 +144,7 @@ st.markdown("""
 
 
 /* Full RAG border on every KPI tile. */
-.kpi{border:3px solid #69879b}
+.kpi{border:6px solid #69879b}
 .kpi.green{border-color:#16865b}
 .kpi.amber{border-color:#bd7600}
 .kpi.red{border-color:#bd3d43}
