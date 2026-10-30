@@ -1,0 +1,617 @@
+{
+  "ptw": [
+    [
+      "1. Planning:",
+      [
+        [
+          "1a",
+          "Was the task reviewed in the 24–48-hour look-ahead process, or, for emerging work before the next daily permit meeting, discussed through the required ad hoc AA/SC meeting before issue?",
+          "BAR 2"
+        ],
+        [
+          "1b",
+          "Has the WCC been discussed in the daily permit meeting?",
+          "BAR 2"
+        ],
+        [
+          "1c",
+          "Have current ORA’s been considered, and how they may impact on the work activity or task?",
+          "BAR 2"
+        ],
+        [
+          "1d",
+          "Has a work site visit been undertaken by the PA AND AA to identify the hazards associated to the task?",
+          "BAR 2"
+        ]
+      ]
+    ],
+    [
+      "2. Raising a NEW WCC: What is the task?",
+      [
+        [
+          "2a",
+          "Is the work scope clearly defined and has the expected duration been considered (shift handover, days/nights etc)?",
+          "BAR 2"
+        ],
+        [
+          "2b",
+          "Is the work location, tools and equipment described clearly and specific?",
+          "BAR 2"
+        ],
+        [
+          "2c",
+          "Where similar or adjacent equipment, unusual numbering, poor labelling or unfamiliarity could cause error, were the risks identified and appropriate verification controls specified?",
+          "BAR 2"
+        ],
+        [
+          "2d",
+          "Does the New WCC clearly describe how the team will carry out the task, including the proposed work method and sequence?",
+          "BAR 2"
+        ],
+        [
+          "2e",
+          "Is the WCC SPECIFIC to the task and not generic?",
+          "BAR 2"
+        ],
+        [
+          "2f",
+          "Were the work party’s competence and authorisation requirements identified and verified for this task, including any specialist requirements?",
+          "BAR 2"
+        ]
+      ]
+    ],
+    [
+      "3. Issuing a Routine WCC:",
+      [
+        [
+          "3a",
+          "Is the Routine WCC used for individual, low risk and regularly performed activities?",
+          "BAR 2"
+        ],
+        [
+          "3b",
+          "Is the Routine WCC task description specific about the scope, location, equipment and work method?",
+          "BAR 2"
+        ],
+        [
+          "3c",
+          "Where routine work involves breaking containment, was the risk assessed and the appropriate WCC route selected?",
+          "BAR 2"
+        ]
+      ]
+    ],
+    [
+      "4. Identifying the Correct WCC:",
+      [
+        [
+          "4a",
+          "Were the WCC type and risk-assessment level selected to match the actual task and its hazards?",
+          "BAR 2"
+        ],
+        [
+          "4b",
+          "Where supplementary risk assessments are required, were the relevant assessments completed and linked to the WCC?",
+          "BAR 2"
+        ]
+      ]
+    ],
+    [
+      "5. Level 2 Risk Assessment:",
+      [
+        [
+          "5a",
+          "Was the Level 2 risk assessment completed by the required suitably knowledgeable team under a competent leader?",
+          "BAR 2"
+        ]
+      ]
+    ],
+    [
+      "6. Risk Assessment - Task Steps:",
+      [
+        [
+          "6a",
+          "Is the task broken into clearly defined steps in the correct working sequence on the WCC?",
+          "BAR 2"
+        ]
+      ]
+    ],
+    [
+      "7. Clear Hazard Identification Statements:",
+      [
+        [
+          "7a",
+          "Does each hazard statement identify the hazard and credible harm clearly?",
+          "BAR 2"
+        ],
+        [
+          "7b",
+          "Is each hazard statement limited to one distinct hazard?",
+          "BAR 2"
+        ]
+      ]
+    ],
+    [
+      "8. Clear Control Statements:",
+      [
+        [
+          "8a",
+          "Are Control Statements clear on Who is doing what and when?",
+          "BAR 2"
+        ],
+        [
+          "8b",
+          "Are the control statements sufficiently detailed, concise and written in clear language?",
+          "BAR 2"
+        ]
+      ]
+    ],
+    [
+      "9. Control Effectiveness:",
+      [
+        [
+          "9a",
+          "Is the proposed risk reduction credible, allowing for human error and the number of actions assigned to individuals?",
+          "BAR 2"
+        ]
+      ]
+    ],
+    [
+      "10. Hierarchy of Controls:",
+      [
+        [
+          "10a",
+          "Were elimination and substitution considered before reliance on procedures or PPE?",
+          "BAR 2"
+        ]
+      ]
+    ],
+    [
+      "11. Low Value Hazard & Controls (avoiding Clutter):",
+      [
+        [
+          "11a",
+          "Is the WCC free from hazards and controls which do not actively reduce the risk OR are part of standardised measures already in place i.e. standards / Standard PPE etc.",
+          "BAR 3"
+        ],
+        [
+          "11b",
+          "Are the controls capable of verifying and proving the risk gap has been closed and not vague using words such as 'decide' or 'consider' or 'if required'.",
+          "BAR 2"
+        ]
+      ]
+    ],
+    [
+      "12. Isolation Requirements:",
+      [
+        [
+          "12a",
+          "Where an ICC is required, are its required controls accurately referenced on the WCC?",
+          "BAR 2"
+        ]
+      ]
+    ],
+    [
+      "13. Low Risk Tasks which do not require a WCC:",
+      [
+        [
+          "13a",
+          "Is the site actively monitored to ensure tasks are not being undertaken without an appropriate WCC?",
+          "BAR 2"
+        ],
+        [
+          "13b",
+          "And, for those non-permit tasks, is a toolbox talk completed?",
+          "BAR 2"
+        ]
+      ]
+    ]
+  ],
+  "tbt": [
+    [
+      "1. TBT Hazard Identification: Join the TBT and confirm that the following discussions have taken place:",
+      [
+        [
+          "1a",
+          "Did the TBT Lead discuss task-specific hazards and controls from the risk assessment with the work party?",
+          "BAR 2"
+        ],
+        [
+          "1b",
+          "Where SIMOPS affect this task, were the interfaces and agreed work controls discussed with the work party?",
+          "BAR 2"
+        ],
+        [
+          "1c",
+          "Where spills or open drains are credible hazards, were the risks and prevention measures discussed?",
+          "BAR 2"
+        ],
+        [
+          "1d",
+          "Where dropped objects are a credible hazard, were the hazards and required prevention measures discussed?",
+          "BAR 2"
+        ],
+        [
+          "1e",
+          "Where isolations are required, were the isolation boundaries and personnel responsibilities discussed at the TBT?",
+          "BAR 2"
+        ],
+        [
+          "1f",
+          "Were the emergency arrangements relevant to this task discussed and understood by the work party?",
+          "BAR 2"
+        ],
+        [
+          "1g",
+          "Where new hazards arose, was work paused and the TBT updated for minor changes, or the AA involved for significant changes before work resumed?",
+          "BAR 2"
+        ],
+        [
+          "1h",
+          "Is the TBT used for its intention i.e. Discuss task details by reviewing the identified energy prompts in the RA and control measures. Review key supporting documentation and record MINOR additional hazards?",
+          "BAR 2"
+        ]
+      ]
+    ],
+    [
+      "2. TBT Understanding the Task: What is the task or activity? How is it chunked into key steps?",
+      [
+        [
+          "2a",
+          "Are questions open to engage the work party?",
+          "BAR 2"
+        ],
+        [
+          "2b",
+          "Is the activity broken down into significant steps?",
+          "BAR 2"
+        ],
+        [
+          "2c",
+          "Could the work party clearly explain how each task step would be completed?",
+          "BAR 2"
+        ],
+        [
+          "2d",
+          "Has the work party actively participated in the safety toolbox talk discussion and signed the TBT",
+          "BAR 2"
+        ],
+        [
+          "2e",
+          "Where there is a Lone Work party, confirm that the PA has completed the TBT with the Area Authority (AA) prior to commencing the task.",
+          "BAR 2"
+        ]
+      ]
+    ],
+    [
+      "3. Hazards associated to the Worksite and Equipment:",
+      [
+        [
+          "3a",
+          "Have tools and equipment been clearly identified on the risk assessment and adequate controls in place?",
+          "BAR 2"
+        ],
+        [
+          "3b",
+          "Were hazards from transporting tools and equipment to the worksite assessed and controlled?",
+          "BAR 2"
+        ],
+        [
+          "3c",
+          "Are all access and egress points checked and clear?",
+          "BAR 2"
+        ]
+      ]
+    ],
+    [
+      "4. Permit Compliance:",
+      [
+        [
+          "4a",
+          "Is the current WCC available at the worksite and signed by every member of the work party?",
+          "BAR 2"
+        ],
+        [
+          "4b",
+          "Is the permit (New or Routine) SPECIFIC for the task and not generic?",
+          "BAR 2"
+        ],
+        [
+          "4c",
+          "Is the task broken down into clearly defined steps and details the sequence in which it will be done?",
+          "BAR 2"
+        ]
+      ]
+    ],
+    [
+      "5. Permit Compliance - Implementing the Controls:",
+      [
+        [
+          "5a",
+          "If required, have gas tests been carried out and recorded on the permit? And a gas detector available if required?",
+          "BAR 1"
+        ],
+        [
+          "5b",
+          "Have all controls on the permit been implemented?",
+          "BAR 1"
+        ],
+        [
+          "5c",
+          "Have controls within supplementary risk evaluation such as COSHH, Manual Handling, HAVS, BOC checks etc been implemented and the team is aware?",
+          "BAR 2"
+        ],
+        [
+          "5d",
+          "Where substances are in use, does the work party understand what action to take in an emergency?",
+          "BAR 2"
+        ],
+        [
+          "5e",
+          "Have additional method statements been reviewed, recorded and complied with?",
+          "BAR 2"
+        ]
+      ]
+    ],
+    [
+      "6. Permit Authorisation:",
+      [
+        [
+          "6a",
+          "Has the WCC received the required authorisation from the AA and Site Controller, where applicable?",
+          "BAR 2"
+        ],
+        [
+          "6b",
+          "Where Site Controller approval is required for Level 2 work, was the assessment discussed and approved before work began?",
+          "BAR 2"
+        ]
+      ]
+    ],
+    [
+      "7. Managing “Low Risk” activities - Review how low risk tasks are managed on site:",
+      [
+        [
+          "7a",
+          "Is the routine WCC suitable and specific for the task and appropriate to justify “low risk”?",
+          "BAR 2"
+        ],
+        [
+          "7b",
+          "Those tasks which do not require a permit i.e. routine helideck ops etc, has a TBT been completed?",
+          "BAR 2"
+        ]
+      ]
+    ]
+  ],
+  "pop": [
+    [
+      "8. Process Operating Procedures (POP):",
+      [
+        [
+          "8a",
+          "Has a TBT been completed prior to work commencing",
+          "BAR 2"
+        ],
+        [
+          "8b",
+          "Is the POP being followed in the correct sequence? Valve line up completed (where appropriate).",
+          "BAR 2"
+        ],
+        [
+          "8c",
+          "Two person signatures applied for critical steps?",
+          "BAR 1"
+        ],
+        [
+          "8d",
+          "Are operators using the most up to date POP’s – check how controlled documents are managed.",
+          "BAR 2"
+        ],
+        [
+          "8e",
+          "Is the POP in its review date? And has it been transferred to the new format (i.e. Task screening assessment)",
+          "BAR 2"
+        ],
+        [
+          "8f",
+          "Are completed POP’s scanned and uploaded to a designated storage area",
+          "BAR 3"
+        ],
+        [
+          "8g",
+          "Is the handover section signed at the end of the shift and countersigned by incoming and outgoing OTL?",
+          "BAR 2"
+        ]
+      ]
+    ]
+  ],
+  "lead": [
+    [
+      "Understanding the work",
+      [
+        [
+          "UW-01",
+          "Can the work party explain the task purpose, current stage and next steps?",
+          "BAR 2",
+          "The account matches the work being done and the permit or work pack; personnel describe their own part of the sequence."
+        ],
+        [
+          "UW-02",
+          "Can the PA show how the task was planned and the worksite prepared?",
+          "BAR 2",
+          "Scope, site conditions, resources, permit, risk assessment and required isolations or interfaces have been considered before work starts."
+        ],
+        [
+          "UW-03",
+          "Can interviewed work party members explain their roles, the PA’s role and who provides supervision?",
+          "BAR 2",
+          "Responsibilities are clear and consistent with the permit, work pack and arrangements at the worksite."
+        ],
+        [
+          "UW-04",
+          "Can the PA explain why the selected Control of Work route applies to this task?",
+          "BAR 2",
+          "The chosen permit or routine-work route, risk assessment and supporting controls fit the actual activity."
+        ]
+      ]
+    ],
+    [
+      "Hazards and controls",
+      [
+        [
+          "HC-01",
+          "Can the work party identify the significant hazards of the work under way and their credible consequences?",
+          "BAR 2",
+          "Task-specific and site-specific hazards, including process safety hazards where relevant, are understood; generic lists alone are insufficient."
+        ],
+        [
+          "HC-02",
+          "Can the work party explain how the identified hazard controls are applied in their work?",
+          "BAR 2",
+          "Personnel link task hazards to physical, procedural and operational controls and explain their own actions. The status of required critical controls is checked separately at HC-04."
+        ],
+        [
+          "HC-03",
+          "Can personnel identify the controls most critical to safe execution and what they would do if one failed?",
+          "BAR 2",
+          "They recognise the relevant barriers, consequence of failure, and the need to stop or make work safe and seek reassessment."
+        ],
+        [
+          "HC-04",
+          "Are the critical controls required for this task present and functioning at the worksite?",
+          "BAR 1",
+          "Check the required isolation, gas test, containment measure or other task-critical control against the work pack and at the worksite. If it cannot be demonstrated, record No, make the work safe and seek verification. Select N/A only when no such control applies."
+        ],
+        [
+          "HC-05",
+          "Has the PA accounted for current site conditions and any SIMOPS or ORAs affecting this task?",
+          "BAR 2",
+          "The PA has checked site conditions and relevant interfaces or degraded barriers; work controls reflect them. The absence of SIMOPS or an ORA does not make the whole question N/A."
+        ]
+      ]
+    ],
+    [
+      "Toolbox Talk effectiveness",
+      [
+        [
+          "TT-01",
+          "Can work party members explain the task-specific hazards, controls and sequence discussed at the Toolbox Talk?",
+          "BAR 2",
+          "Responses are consistent with the work pack and demonstrate understanding beyond having signed the attendance record."
+        ],
+        [
+          "TT-02",
+          "Were personnel invited to raise concerns and was their understanding checked before work began?",
+          "BAR 2",
+          "The PA and work party can describe the discussion and how questions or concerns were addressed; no concern need have been raised."
+        ],
+        [
+          "TT-03",
+          "Can individuals explain the controls and actions they personally own?",
+          "BAR 2",
+          "Each person knows what they must do, verify or communicate during the task."
+        ]
+      ]
+    ],
+    [
+      "Change and stop work",
+      [
+        [
+          "MC-01",
+          "Can personnel describe the conditions that would require them to pause or stop this task?",
+          "BAR 2",
+          "They can identify relevant changes, new hazards or ineffective controls and understand their authority to stop work."
+        ],
+        [
+          "MC-02",
+          "Where conditions have changed, was work paused and reassessed before continuing?",
+          "BAR 2",
+          "The change was communicated, the risk assessment and permit were reviewed by the appropriate roles, and required approval was obtained. Select N/A if no relevant change occurred."
+        ],
+        [
+          "MC-03",
+          "Do personnel know whom to contact and how to raise a concern if work becomes unsafe?",
+          "BAR 2",
+          "They identify the PA, supervisor or Site Controller as appropriate and describe how work would remain safe pending a decision."
+        ],
+        [
+          "MC-04",
+          "If a critical control failed or was lost during this task, was work stopped and made safe?",
+          "BAR 1",
+          "Work did not continue without the required barrier; the failure was escalated and the task was reassessed and authorised before restart. Select N/A if no critical control failure occurred. Record and escalate the control failure separately even where the stop-work response was effective."
+        ]
+      ]
+    ],
+    [
+      "Supervision and leadership",
+      [
+        [
+          "SL-01",
+          "Can the PA explain how the work party is supervised during this activity?",
+          "BAR 2",
+          "Supervision and communication suit the task, location, competence and level of risk."
+        ],
+        [
+          "SL-02",
+          "Can the work party access supervision and support when needed?",
+          "BAR 2",
+          "Personnel know who is available and how to contact them; observed arrangements match the PA’s account."
+        ],
+        [
+          "SL-03",
+          "Can the Site Controller demonstrate that active permits and worksite execution are checked and deviations acted on?",
+          "BAR 2",
+          "Current or recent permit and worksite checks are evidenced; any deviations identified were corrected or controlled during work."
+        ],
+        [
+          "SL-04",
+          "Can the Site Controller show how current high-risk work, SIMOPS or degraded barriers are being controlled?",
+          "BAR 2",
+          "They identify active worksite interfaces or vulnerabilities and demonstrate the operational controls, additional supervision or restrictions being applied. Select N/A only if no such condition is present."
+        ]
+      ]
+    ],
+    [
+      "Learning and improvement",
+      [
+        [
+          "LI-01",
+          "Can personnel describe recent Control of Work learning communicated to their work party?",
+          "BAR 3",
+          "They can identify a relevant alert, finding or lesson and when it was discussed. Select N/A if no relevant learning has been issued in the review period."
+        ],
+        [
+          "LI-02",
+          "Can the Site Controller show how a recent Control of Work finding or workforce concern was followed up?",
+          "BAR 3",
+          "The issue was assessed, assigned to an owner and tracked to its due date; completed actions were checked for effectiveness. An action that is still within its agreed timescale need not be complete. Select N/A if no relevant issue arose in the review period."
+        ],
+        [
+          "LI-03",
+          "Can the Site Controller show how Control of Work improvement actions are tracked and reviewed?",
+          "BAR 3",
+          "The improvement log or equivalent shows owners, due dates, completion evidence and review of effectiveness; operational deficiencies are assessed under the relevant control questions."
+        ]
+      ]
+    ]
+  ],
+  "lead_narrative": [
+    [
+      "N-01",
+      "What has leadership engagement done recently that helped safe execution of work?"
+    ],
+    [
+      "N-02",
+      "What barriers or resource constraints make this work harder to carry out safely?"
+    ],
+    [
+      "N-03",
+      "What worked well in planning or executing this task?"
+    ],
+    [
+      "N-04",
+      "What would improve the Control of Work process or support for this task?"
+    ]
+  ]
+}
+
