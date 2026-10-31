@@ -826,6 +826,8 @@ def dashboard():
         if quality_issues:
             with st.expander(f"Data quality checks · {quality_issues} items to review"):
                 st.write(f"{unclassified} permit audits need a verified routine/non-routine category; {missing_core} records lack a site or auditor; {max(0,len(action_findings)-action_recorded)} No responses have no recorded SMART action. Review the records and evidence in Findings & Actions.")
+        from client_walkthrough import snapshot
+        snapshot(permit+tbt+lead,statuses)
         st.markdown('<div class="section-head">CoW KPI Results</div>',unsafe_allow_html=True)
         cols=st.columns(5)
         unassigned=[a for a in permit if permit_auditor_role(a,pmap) not in ("Site Controller","Asset Superintendent")]
@@ -883,7 +885,19 @@ def dashboard():
                 st.markdown("**Measure and target**\nReport incidents confirmed as occurring during permit-controlled activities over a **rolling 12-month period**, with identification of HiPOs, losses of containment and significant injuries (MTC or above). Use reviewed Incident Register records and the Incident Register tracking spreadsheet.\n\n**Green:** No increase in the rolling 12-month incident trend. No HiPOs, significant injuries (MTC or above), or repeat loss-of-containment events identified. No intervention required; continue monitoring and discussion through Monthly Operations and QSHE meetings.\n\n**Amber:** Increasing incident trend, a single HiPO, significant injury, loss of containment, or a repeat event theme identified within the reporting period. Operations Director intervention through targeted campaigns, assurance activities or focused reviews to address identified themes.\n\n**Red:** Significant increase in incidents, multiple HiPOs, significant injuries (MTC or above), major loss-of-containment events, or evidence of recurring failures in permit controls. Immediate General Manager intervention; investigation findings, learning actions and improvement measures implemented and tracked to closure.")
         st.markdown("### Explore the assurance data")
         st.caption("Start with insights → open a detailed KPI → review findings and owners → present the leadership report. All views use the month, asset and site selected above.")
-        selected_view=st.radio("Choose a data view",["Assurance Insights","Leadership Report","Detailed KPI Reports","Findings & Actions","Auditor View","Company & Site Performance","Monthly History","KPI 5 Data","Human Factors"],horizontal=True,key="dashboard-data-view",label_visibility="collapsed")
+        selected_view=st.radio("Choose a data view",["Assurance Insights","Leadership Report","Detailed KPI Reports","Findings & Actions","Auditor View","Company & Site Performance","Monthly History","KPI 5 Data","Human Factors","Evidence Trail","Improvement Scenario"],horizontal=True,key="dashboard-data-view",label_visibility="collapsed")
+        evidence_groups={
+            "KPI 1 · Site Controller":sc_samples,
+            "KPI 2 · Asset Superintendent":as_samples,
+            "KPI 3 · Leadership (quarter to date)":qlead,
+            "KPI 4 · Remote Site audit conformance":[a for a in tbt if a["site"] in {"North Remote Sites","South Remote Sites"} and tbt_auditor_role(a,tmap) in {"Operations Supervisor","HSE Adviser","Site Manager"}],
+        }
+        if selected_view=="Evidence Trail":
+            from client_walkthrough import evidence_trail
+            evidence_trail(evidence_groups,period)
+        if selected_view=="Improvement Scenario":
+            from client_walkthrough import improvement_scenario
+            improvement_scenario(evidence_groups)
         if selected_view=="Monthly History":
             st.subheader("Monthly History")
             dated=[(a,safe_date(a["audit_date"])) for a in all_a]
