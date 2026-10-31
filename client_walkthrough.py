@@ -3,6 +3,13 @@ import math
 from collections import Counter
 
 
+def open_demo_evidence(label):
+    import streamlit as st
+    st.session_state['dashboard-data-view'] = 'Detailed KPI Reports' if label == 'KPI 5' else 'Evidence Trail'
+    if label != 'KPI 5':
+        st.session_state['trail-kpi'] = label
+
+
 def scored(rows):
     return [(a, [r for r in a.get('responses', []) if r.get('response') in ('Yes', 'No')]) for a in rows if any(r.get('response') in ('Yes', 'No') for r in a.get('responses', []))]
 
