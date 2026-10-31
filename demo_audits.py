@@ -3,7 +3,7 @@ import json
 from datetime import date, timedelta
 
 PERIOD = '2026-09'
-SCENARIO = 'september-conformance-75-83-v2'
+SCENARIO = 'september-conformance-75-83-hf-v3'
 
 
 def prepare(db, questions, groups):
@@ -38,7 +38,23 @@ def prepare(db, questions, groups):
                     row['immediate_action']='DEMO: work stopped and made safe; required controls to be verified before authorised restart.'
         if form=='lead':
             responses.append(dict(section='Conversation prompts',item='N-02',question='What made the task harder?',response='Comment',comments_evidence='Generated example: equipment access was restricted and the handover helped the team plan the work.'))
-        meta=dict(site=site,audit_date=str(day),auditor=person,reference=aid,team=team,nui_team=team,auditor_role=role,leadership_role=role,permit_sample_category=category,new_wcc=category=='Non-routine',demo_scenario=SCENARIO)
+        hf_examples=[
+            "During the toolbox briefing the team could not identify the isolation boundary from the outdated drawing in the work pack. The supervisor paused preparation and requested the current drawing before authorisation.",
+            "The night-to-day handover omitted the temporary access restriction. The incoming team discovered the blocked route at the worksite and revised the equipment movement plan with the supervisor.",
+            "Two concurrent jobs competed for the same lifting equipment. Time pressure and coordination gaps were discussed; the supervisor resequenced the work rather than asking the team to rush.",
+            "A technician unfamiliar with this valve arrangement asked for support. A competent colleague demonstrated the identification checks and the technician repeated them before work started.",
+            "High noise at the worksite made the radio briefing difficult to hear. Moving the briefing to a quiet area and using repeat-back helped each person explain their task and stop-work conditions.",
+            "The procedure referred to an obsolete equipment tag. The team highlighted the ambiguous instruction and raised a document correction; no informal workaround was accepted.",
+            "Restricted access required an awkward posture to read the local gauge. The team stopped the check and requested a safer access arrangement and suitable lighting.",
+            "The team reported workload building near shift end. The supervisor reassigned the remaining inspection to the next shift and included the incomplete checks in the written handover.",
+            "A new contractor did not understand a local abbreviation in the permit. The supervisor explained it in plain language and checked understanding through a practical walk-through.",
+            "Clear equipment labels and a joint worksite walk-down helped the team verify the correct isolation points. This was a useful briefing practice observed during preparation.",
+            "The crew described a recurring delay obtaining replacement tools. Leadership agreed to review tool availability with stores; the audit did not establish whether staffing was a contributing factor.",
+            "A conflicting instruction between the procedure and work pack was raised during the briefing. The team held the task pending technical clarification and recorded the agreed revision."
+        ]
+        # Separate, explicitly fictional narrative: does not change Yes/No scores.
+        hf_note="FICTIONAL HF DEMO: "+hf_examples[(serial-1)%len(hf_examples)]
+        meta=dict(site=site,audit_date=str(day),auditor=person,reference=aid,team=team,nui_team=team,auditor_role=role,leadership_role=role,permit_sample_category=category,new_wcc=category=='Non-routine',demo_scenario=SCENARIO,auditor_notes=hf_note)
         c.execute('INSERT INTO audits VALUES(?,?,?,?,?,?,?,?,?,?)',(aid,str(day)+'T12:00:00',title,str(day),site,person,aid,json.dumps(meta),json.dumps(responses),'Non-conformance' if fail else 'Conformant'))
 
     # 48 of 80 weekly/category credits: an obvious Red delivery example.
