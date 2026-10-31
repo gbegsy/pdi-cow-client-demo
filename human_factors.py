@@ -58,31 +58,38 @@ def comment_records(audits):
 def render(audits, period):
     import streamlit as st
     import pandas as pd
-    with st.expander("Human Factors Themes - HSG48 comment review"):
-        st.caption("Uses recorded comments, discussion answers and leadership notes in the selected reporting view. No additional questions or KPI scoring changes.")
-        st.markdown("**HSG48 framework:** Job (task, workload, equipment, environment and procedures); Individual (competence, skills and familiarity); Organisation (resources, work patterns, communication and leadership). These aspects interact.")
-        st.markdown("[HSE HSG48 - Reducing error and influencing behaviour](" + GUIDANCE_URL + ")")
-        st.info("Potential themes are wording matches for human review, not confirmed contributing factors or root causes. A mention may describe a difficulty, something helpful, a suggestion, or the absence of a problem. Read the original account before interpreting it.")
-        st.caption("HSG48 supplies the framework, not the automated wording rules. Suggested mappings can overlap and need review. No slips, lapses, mistakes, violations, attitudes or personal blame are inferred.")
-        rows = comment_records(audits)
-        if not rows:
-            st.info("Insufficient narrative evidence. No substantive comments are recorded in this selection. Yes/No answers and question wording are not used to invent HF themes.")
-            return
-        counts = Counter(theme for row in rows for theme in row["_themes"])
-        domain_counts = Counter(domain for row in rows for domain in row["_domains"])
-        a, b = st.columns(2)
-        a.metric("Recorded comment entries", len(rows))
-        b.metric("Entries without a suggested theme", sum(not r["_themes"] for r in rows))
-        if domain_counts:
-            st.dataframe(pd.DataFrame([{"HSG48 aspect - suggested": k, "Comment entries mentioning related topics": v} for k, v in domain_counts.most_common()]), hide_index=True, use_container_width=True)
-        if counts:
-            st.dataframe(pd.DataFrame([{"Potential theme": k, "Comment entries mentioning theme": v} for k, v in counts.most_common()]), hide_index=True, use_container_width=True)
-            st.caption("Entries may mention several themes. Counts are comments, not people, incidents or verified HF findings.")
-        else:
-            st.caption("Comments are available but no potential themes matched. Review the original accounts below.")
-        st.markdown("**Source comments for review**")
-        frame = pd.DataFrame([{k: v for k, v in row.items() if not k.startswith("_")} for row in rows])
-        st.dataframe(frame, hide_index=True, use_container_width=True)
-        st.download_button("Download comment review CSV", frame.to_csv(index=False).encode("utf-8"), file_name="CoW_HF_Comment_Review_" + period + ".csv", mime="text/csv", key="hf-comment-download")
-        st.caption("All suggestions are unreviewed. This section does not save approvals or alter audit records. Suggested improvements and actions are not proof that a condition occurred.")
+    st.subheader("Human Factors · What audit comments reveal")
+    st.caption("FICTIONAL DEMONSTRATION · Example observations illustrate what submitted audit comments could reveal. They are not actual findings.")
+    st.caption("Uses recorded comments, discussion answers and leadership notes in the selected reporting view. No additional questions or KPI scoring changes.")
+    st.markdown("**HSG48 framework:** Job (task, workload, equipment, environment and procedures); Individual (competence, skills and familiarity); Organisation (resources, work patterns, communication and leadership). These aspects interact.")
+    st.markdown("[HSE HSG48 - Reducing error and influencing behaviour](" + GUIDANCE_URL + ")")
+    st.info("Potential themes are wording matches for human review, not confirmed contributing factors or root causes. A mention may describe a difficulty, something helpful, a suggestion, or the absence of a problem. Read the original account before interpreting it.")
+    st.caption("HSG48 supplies the framework, not the automated wording rules. Suggested mappings can overlap and need review. No slips, lapses, mistakes, violations, attitudes or personal blame are inferred.")
+    rows = comment_records(audits)
+    if not rows:
+        st.info("Insufficient narrative evidence. No substantive comments are recorded in this selection. Yes/No answers and question wording are not used to invent HF themes.")
+        return
+    counts = Counter(theme for row in rows for theme in row["_themes"])
+    domain_counts = Counter(domain for row in rows for domain in row["_domains"])
+    a, b = st.columns(2)
+    a.metric("Recorded comment entries", len(rows))
+    b.metric("Entries without a suggested theme", sum(not r["_themes"] for r in rows))
+    if domain_counts:
+        st.dataframe(pd.DataFrame([{"HSG48 aspect - suggested": k, "Comment entries mentioning related topics": v} for k, v in domain_counts.most_common()]), hide_index=True, use_container_width=True)
+    if counts:
+        st.dataframe(pd.DataFrame([{"Potential theme": k, "Comment entries mentioning theme": v} for k, v in counts.most_common()]), hide_index=True, use_container_width=True)
+        st.caption("Entries may mention several themes. Counts are comments, not people, incidents or verified HF findings.")
+    else:
+        st.caption("Comments are available but no potential themes matched. Review the original accounts below.")
+    st.markdown("**Source comments for review**")
+    frame = pd.DataFrame([{k: v for k, v in row.items() if not k.startswith("_")} for row in rows])
+    f1,f2=st.columns(2)
+    aspect=f1.selectbox("HSG48 aspect",["All","Job","Individual","Organisation"],key="hf-aspect")
+    theme=f2.selectbox("Comment theme",["All"]+list(THEMES),key="hf-theme")
+    if aspect!="All": frame=frame[frame["Suggested HSG48 aspects"].str.contains(aspect,regex=False)]
+    if theme!="All": frame=frame[frame["Potential themes"].str.contains(theme,regex=False)]
+    st.caption(f"{len(frame)} source comments shown. Counts above describe the full reporting selection; filters below narrow the source list.")
+    st.dataframe(frame, hide_index=True, use_container_width=True)
+    st.download_button("Download comment review CSV", frame.to_csv(index=False).encode("utf-8"), file_name="CoW_HF_Comment_Review_" + period + ".csv", mime="text/csv", key="hf-comment-download")
+    st.caption("All suggestions are unreviewed. This section does not save approvals or alter audit records. Suggested improvements and actions are not proof that a condition occurred.")
 
