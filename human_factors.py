@@ -11,7 +11,7 @@ THEMES = {
     "Competence and familiarity": r"\b(competenc\w*|training|unfamiliar\w*|inexperienced|experience|knowledge|understanding)\b",
     "Adaptations and what helped": r"\b(adapt\w*|workaround\w*|work around|helped|worked well|made easier|useful|improvis\w*)\b",
 }
-PLACEHOLDERS = {"", "yes", "no", "na", "n/a", "none", "nil", "not applicable", "no comment", "no comments", "not recorded", "-", "test"}
+PLACEHOLDERS = {"", "yes", "no", "na", "n/a", "none", "nil", "not applicable", "no comment", "no comments", "not recorded", "-", "test", "fictional failed check in a deliberately concentrated demonstration scenario"}
 # HSG48's three interacting aspects. Topic mappings are application suggestions,
 # not an HSE classification algorithm; overlap is intentional.
 DOMAINS = {
@@ -71,6 +71,9 @@ def render(audits, period):
         return
     counts = Counter(theme for row in rows for theme in row["_themes"])
     domain_counts = Counter(domain for row in rows for domain in row["_domains"])
+    st.markdown("#### Themes to explore with the workforce")
+    if counts:
+        st.write("Most mentioned: "+", ".join(f"{theme} ({count} comments)" for theme,count in counts.most_common(3))+". Review the accounts below to distinguish difficulties, helpful practices and suggestions.")
     a, b = st.columns(2)
     a.metric("Recorded comment entries", len(rows))
     b.metric("Entries without a suggested theme", sum(not r["_themes"] for r in rows))
@@ -83,6 +86,8 @@ def render(audits, period):
         st.caption("Comments are available but no potential themes matched. Review the original accounts below.")
     st.markdown("**Source comments for review**")
     frame = pd.DataFrame([{k: v for k, v in row.items() if not k.startswith("_")} for row in rows])
+    front=["Original comment","Potential themes","Suggested HSG48 aspects","Audit ID","Date","Site / Team","Source reference"]
+    frame=frame[front+[c for c in frame.columns if c not in front]]
     f1,f2=st.columns(2)
     aspect=f1.selectbox("HSG48 aspect",["All","Job","Individual","Organisation"],key="hf-aspect")
     theme=f2.selectbox("Comment theme",["All"]+list(THEMES),key="hf-theme")
