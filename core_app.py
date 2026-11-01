@@ -205,9 +205,9 @@ button:focus-visible,input:focus-visible,textarea:focus-visible,[role="combobox"
 @media(min-width:1100px){
  [data-testid="stHorizontalBlock"]:has(.kpi){flex-wrap:nowrap!important;gap:12px}
  [data-testid="stHorizontalBlock"]:has(.kpi)>[data-testid="stColumn"]{flex:1 1 0!important;min-width:0!important}
- .kpi{height:440px!important;min-height:440px;grid-template-rows:14px 52px 150px 24px 40px minmax(58px,1fr);gap:6px;padding:12px}
+ .kpi{height:480px!important;min-height:480px;grid-template-rows:14px 52px 190px 24px 40px minmax(58px,1fr);gap:6px;padding:12px}
  .kpi .ks{font-size:14px}
- .kpi .metric-pair{grid-template-rows:86px 56px;gap:8px}
+ .kpi .metric-pair{grid-template-rows:124px 58px;gap:8px}
  .kpi .metric-line strong{font-size:16px}
  .kpi .metric-line span{font-size:9px}
  .kpi .kd{font-size:11px;line-height:1.4}
