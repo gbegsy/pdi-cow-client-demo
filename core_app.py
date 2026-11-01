@@ -903,242 +903,243 @@ def dashboard():
             st.button("Open KPI 5 reports",key="open-kpi-5",use_container_width=True,on_click=open_demo_evidence,args=("KPI 5",))
             with st.expander("KPI Targets & Tolerances"):
                 st.markdown("**Measure and target**\nReport incidents confirmed as occurring during permit-controlled activities over a **rolling 12-month period**, with identification of HiPOs, losses of containment and significant injuries (MTC or above). Use reviewed Incident Register records and the Incident Register tracking spreadsheet.\n\n**Green:** No increase in the rolling 12-month incident trend. No HiPOs, significant injuries (MTC or above), or repeat loss-of-containment events identified. No intervention required; continue monitoring and discussion through Monthly Operations and QSHE meetings.\n\n**Amber:** Increasing incident trend, a single HiPO, significant injury, loss of containment, or a repeat event theme identified within the reporting period. Operations Director intervention through targeted campaigns, assurance activities or focused reviews to address identified themes.\n\n**Red:** Significant increase in incidents, multiple HiPOs, significant injuries (MTC or above), major loss-of-containment events, or evidence of recurring failures in permit controls. Immediate General Manager intervention; investigation findings, learning actions and improvement measures implemented and tracked to closure.")
-        st.markdown("### Explore the assurance data")
-        st.caption("Start with insights → open a detailed KPI → review findings and owners → present the leadership report. All views use the month, asset and site selected above.")
-        selected_view=st.radio("Choose a data view",["Assurance Insights","Detailed KPI Reports","Evidence Trail","Findings & Actions","Human Factors","Leadership Report","Improvement Scenario","Auditor View","Company & Site Performance","Monthly History","KPI 5 Data"],horizontal=True,key="dashboard-data-view",label_visibility="collapsed")
-        st.markdown(f'<div class="active-view"><strong>Viewing: {html.escape(selected_view)}</strong><span>{md.strftime("%B %Y")} · {html.escape(asset)} · {html.escape(site)}</span></div>',unsafe_allow_html=True)
-        evidence_groups={
-            "KPI 1 · Site Controller":sc_samples,
-            "KPI 2 · Asset Superintendent":as_samples,
-            "KPI 3 · Leadership (quarter to date)":qlead,
-            "KPI 4 · Remote Site audit conformance":[a for a in tbt if a["site"] in {"North Remote Sites","South Remote Sites"} and tbt_auditor_role(a,tmap) in {"Operations Supervisor","HSE Adviser","Site Manager"}],
-        }
-        if selected_view=="Evidence Trail":
-            from client_walkthrough import evidence_trail
-            evidence_trail(evidence_groups,period)
-        if selected_view=="Improvement Scenario":
-            from client_walkthrough import improvement_scenario
-            improvement_scenario(evidence_groups)
-        if selected_view=="Monthly History":
-            st.subheader("Monthly History")
-            dated=[(a,safe_date(a["audit_date"])) for a in all_a]
-            dated=[(a,d) for a,d in dated if d]
-            if not dated:
-                st.info("No dated audit submissions are available yet.")
-            else:
-                first=min(d for _,d in dated).replace(day=1)
-                last=max(max(d for _,d in dated),date.today()).replace(day=1)
-                available_years=range(first.year,last.year+1)
-                selected_year=st.selectbox("HISTORY PERIOD",["All recorded months"]+[str(yr) for yr in reversed(available_years)])
-                months=[]
-                cursor=first
-                while cursor<=last:
-                    if selected_year=="All recorded months" or cursor.year==int(selected_year):months.append(cursor)
-                    cursor=date(cursor.year+1,1,1) if cursor.month==12 else date(cursor.year,cursor.month+1,1)
-                dated=[(a,d) for a,d in dated if site=="All" or a["site"]==site]
-                def history_counts(rows):
-                    aa=[a for a,_ in rows]
-                    permits=[a for a in aa if a["form_name"]=="Control of Work: Permit Quality"]
-                    eligible_lead=leadership_kpi_breakdown([a for a in aa if "Leadership Engagement" in a["form_name"]],lmap,nui_sites)["eligible"]
-                    count5=next((r[4] for r in reversed(history_k5) if r[2]==month_start.strftime("%Y-%m")),None)
-                    return {
-                        "KPI 1 Site Controller – Permit Quality":sum(permit_auditor_role(a,pmap)=="Site Controller" and permit_type(a)!="Unclassified" for a in permits),
-                        "KPI 2 Asset Superintendent – Permit Quality":sum(permit_auditor_role(a,pmap)=="Asset Superintendent" for a in permits),
-                        "KPI 3 Leadership CoW Engagements – Remote Site":len(eligible_lead),
-                        "KPI 4 Site Leadership – Permit compliance Remote Site":sum("Toolbox Talk" in a["form_name"] and tbt_auditor_role(a,tmap) in visit_roles and a["site"] in nui_sites for a in aa),
-                        "KPI 5 Permit-controlled Incidents":count5,
-                    }
-                con=db(); history_k5=con.execute("SELECT * FROM kpi5 WHERE demo=0 AND site=? ORDER BY submitted_at",("All",)).fetchall(); con.close()
-                monthly=[]
-                for month_start in reversed(months):
-                    rows=[(a,d) for a,d in dated if d.year==month_start.year and d.month==month_start.month]
-                    monthly.append({"Month":month_start.strftime("%B %Y"),**history_counts(rows)})
-                st.dataframe(pd.DataFrame(monthly),use_container_width=True,hide_index=True)
-                st.caption("Monthly activity counts use eligible roles. These are activity counts, not historical KPI RAG ratings. KPI 5 is the company-wide rolling incident count.")
-        if selected_view=="Company & Site Performance":
-            st.subheader("Monthly performance by Site / Hub"); rows=[]
-            month_permit=[a for a in month if a["form_name"]=="Control of Work: Permit Quality" and permit_auditor_role(a,pmap)=="Site Controller"]
-            for g,(rw,nw) in selected_groups.items():
-                aa=[a for a in month_permit if a["site"]==g]; routine=sum(permit_type(a)=="Routine" for a in aa); nonroutine=sum(permit_type(a)=="Non-routine" for a in aa); raw_done=routine+nonroutine; done=sum(r["Credited"] for r in monthly_report["weekly"] if r["KPI"]=="KPI 1" and r["Site / Hub"]==g); plan=(rw+nw)*w; pc=completion_percentage(done,plan) if plan else None; cf=audit_conformance([a for a in aa if permit_type(a)!="Unclassified"],rounded=False); status=rag(pc,cf)
-                routine_weeks,_=weekly_coverage(aa,y,m,rw,lambda a:permit_type(a)=="Routine")
-                nonroutine_weeks,_=weekly_coverage(aa,y,m,nw,lambda a:permit_type(a)=="Non-routine")
-                if status=="Green" and (routine_weeks<w or nonroutine_weeks<w):status="Needs review"
-                rows.append({"Site / Group":g,"Routine permits":f"{routine}/{rw*w}","Non-routine permits":f"{nonroutine}/{nw*w}","Recorded SC audits":len(aa),"Awaiting permit category verification":len(aa)-raw_done,"Planned":plan,"Eligible classified samples":done,"Completion %":round(pc,1) if pc is not None else None,"Whole-audit conformance %":round(cf,1) if cf is not None else None,"RAG":status})
-            st.dataframe(pd.DataFrame(rows),use_container_width=True,hide_index=True)
-            st.caption(f"Monthly basis: {w} reporting weeks. Only Site Controller audits with a recorded routine/non-routine category count toward planned samples. Permit Register source verification remains required. Blank completion and Not assessed mean there are no SC records at that site; they do not establish zero work in Permit Register.")
-            excluded=[a for a in month if a["form_name"]=="Control of Work: Permit Quality" and permit_auditor_role(a,pmap)!="Asset Superintendent" and (a["site"] not in SITE_GROUPS or permit_auditor_role(a,pmap)!="Site Controller" or permit_type(a)=="Unclassified")]
-            if excluded:
-                st.markdown("#### Site Controller attribution or category review")
-                st.dataframe(pd.DataFrame([{"Audit ID":a["audit_id"],"Date":a["audit_date"],"Entered location":a["site"],"Auditor role":permit_auditor_role(a,pmap),"Sample category":permit_type(a),"Reason":", ".join(x for x in ("Location outside SC groups" if a["site"] not in SITE_GROUPS else "","Auditor role requires verification" if permit_auditor_role(a,pmap)!="Site Controller" else "","Category not verified" if permit_type(a)=="Unclassified" else "") if x)} for a in excluded]),use_container_width=True,hide_index=True)
-                with st.expander("Validate a historic permit record against Permit Register"):
-                    chosen_id=st.selectbox("Audit ID for correction",[a["audit_id"] for a in excluded],key=f"permit-fix-{period}")
-                    chosen=next(a for a in excluded if a["audit_id"]==chosen_id)
-                    with st.form(f"permit-correction-{chosen_id}"):
-                        c1,c2,c3=st.columns(3)
-                        corrected_site=c1.selectbox("Verified site / group",ASSET_GROUPS,index=ASSET_GROUPS.index(chosen["site"]) if chosen["site"] in ASSET_GROUPS else 0)
-                        corrected_role=c2.selectbox("Verified auditor role",["Site Controller","Asset Superintendent","Other"],index=["Site Controller","Asset Superintendent","Other"].index(permit_auditor_role(chosen,pmap)) if permit_auditor_role(chosen,pmap) in ["Site Controller","Asset Superintendent","Other"] else 2)
-                        corrected_category=c3.selectbox("Verified Permit Register category",["Routine","Non-routine"],index=["Routine","Non-routine"].index(permit_type(chosen)) if permit_type(chosen) in ["Routine","Non-routine"] else 0)
-                        correction_ref=st.text_input("Permit Register source reference / validation note")
-                        correct=st.form_submit_button("Save verified attribution")
-                    if correct:
-                        if not correction_ref.strip():st.error("Enter a Permit Register reference or validation note before changing an audit.")
-                        else:
-                            metadata=dict(chosen["metadata"])
-                            history=list(metadata.get("attribution_history") or [])
-                            history.append({"corrected_at":datetime.now().isoformat(timespec="seconds"),"source":correction_ref.strip(),"previous_site":chosen["site"],"previous_role":metadata.get("auditor_role"),"previous_category":metadata.get("permit_sample_category"),"site":corrected_site,"role":corrected_role,"category":corrected_category})
-                            metadata.update(site=corrected_site,auditor_role=corrected_role,permit_sample_category=corrected_category,attribution_history=history)
-                            c=db(); c.execute("UPDATE audits SET site=?,metadata=? WHERE audit_id=?",(corrected_site,json.dumps(metadata),chosen_id)); c.commit(); c.close(); st.rerun()
-        if selected_view=="Findings & Actions":
-            rows=[]
-            for a in permit+tbt+lead:
-                for r in a["responses"]:
-                    if str(r.get("response","")).lower()!="no":
-                        continue
-                    rows.append({
-                        "BAR":r.get("bar_rating",""),
-                        "Date":a.get("audit_date",""),
-                        "Audit ID":a.get("audit_id",""),
-                        "Site":a.get("site",""),
-                        "Form":a.get("form_name",""),
-                        "Auditor":a.get("auditor",""),
-                        "Ref":r.get("item",""),
-                        "Finding":r.get("question",""),
-                        "Evidence":r.get("comments_evidence",""),
-                        "Immediate action":r.get("immediate_action",""),
-                        "SMART action":r.get("smart_action",""),
-                        "Owner":r.get("action_owner",""),
-                        "Due date":r.get("action_due_date",""),
-                    })
-            if rows:
-                findings_df=pd.DataFrame(rows)
-                findings_df["_bar_order"]=findings_df["BAR"].map({"BAR 1":1,"BAR 2":2,"BAR 3":3}).fillna(4)
-                findings_df=findings_df.sort_values(["_bar_order","Date","Audit ID"],ascending=[True,False,True]).drop(columns="_bar_order")
-                bar1_df=findings_df[findings_df["BAR"]=="BAR 1"]
-                f1,f2,f3=st.columns([1,1,2])
-                selected_bar=f1.selectbox("BAR level",["All","BAR 1","BAR 2","BAR 3"],key="findings-bar")
-                selected_owner=f2.selectbox("Action owner",["All"]+sorted(set(findings_df["Owner"]) - {""}),key="findings-owner")
-                search=f3.text_input("Search findings",placeholder="Question, site, auditor or action…",key="findings-search")
-                filtered=findings_df.copy()
-                if selected_bar!="All": filtered=filtered[filtered["BAR"]==selected_bar]
-                if selected_owner!="All": filtered=filtered[filtered["Owner"]==selected_owner]
-                if search.strip(): filtered=filtered[filtered.astype(str).apply(lambda col: col.str.contains(search.strip(),case=False,regex=False)).any(axis=1)]
-                st.caption(f"Showing {len(filtered)} of {len(findings_df)} non-conformances in the selected reporting scope.")
-                st.download_button("Download selected findings",filtered.drop(columns=["Evidence","Immediate action"],errors="ignore").to_csv(index=False).encode("utf-8-sig"),f"CoW_Findings_{period}.csv","text/csv",key="findings-download")
-                bar1_df=filtered[filtered["BAR"]=="BAR 1"]
-                st.markdown(f"#### BAR 1 non-conformances ({len(bar1_df)})")
-                st.caption("BAR is assigned to the question, not separately to the finding.")
-                if len(bar1_df):
-                    for finding in bar1_df.to_dict("records"):
-                        with st.container(border=True):
-                            st.markdown(f"**{finding['Ref'] or 'Question'} · {finding['Site']}**")
-                            st.caption(f"{finding['Date']} · {finding['Form']} · Audit {finding['Audit ID']}")
-                            st.write(finding["Finding"])
-                            st.markdown("**Evidence**")
-                            st.write(finding["Evidence"] or "Not recorded.")
-                            st.markdown("**Immediate safety action / current exposure**")
-                            st.write(finding["Immediate action"] or "Not recorded.")
-                            st.markdown("**SMART action**")
-                            st.write(finding["SMART action"] or "Not recorded.")
-                            st.caption(f"Owner: {finding['Owner'] or '—'} · Due: {finding['Due date'] or '—'}")
+        @st.fragment
+        def render_dashboard_views():
+            st.markdown("### Explore the assurance data")
+            st.caption("Start with insights → open a detailed KPI → review findings and owners → present the leadership report. All views use the month, asset and site selected above.")
+            selected_view=st.radio("Choose a data view",["Assurance Insights","Detailed KPI Reports","Evidence Trail","Findings & Actions","Human Factors","Leadership Report","Improvement Scenario","Auditor View","Company & Site Performance","Monthly History","KPI 5 Data"],horizontal=True,key="dashboard-data-view",label_visibility="collapsed")
+            st.markdown(f'<div class="active-view"><strong>Viewing: {html.escape(selected_view)}</strong><span>{md.strftime("%B %Y")} · {html.escape(asset)} · {html.escape(site)}</span></div>',unsafe_allow_html=True)
+            evidence_groups={
+                "KPI 1 · Site Controller":sc_samples,
+                "KPI 2 · Asset Superintendent":as_samples,
+                "KPI 3 · Leadership (quarter to date)":qlead,
+                "KPI 4 · Remote Site audit conformance":[a for a in tbt if a["site"] in {"North Remote Sites","South Remote Sites"} and tbt_auditor_role(a,tmap) in {"Operations Supervisor","HSE Adviser","Site Manager"}],
+            }
+            if selected_view=="Evidence Trail":
+                from client_walkthrough import evidence_trail
+                evidence_trail(evidence_groups,period)
+            if selected_view=="Improvement Scenario":
+                from client_walkthrough import improvement_scenario
+                improvement_scenario(evidence_groups)
+            if selected_view=="Monthly History":
+                st.subheader("Monthly History")
+                dated=[(a,safe_date(a["audit_date"])) for a in all_a]
+                dated=[(a,d) for a,d in dated if d]
+                if not dated:
+                    st.info("No dated audit submissions are available yet.")
                 else:
-                    st.success("No failed BAR 1 questions in this view.")
-                st.markdown(f"#### Selected non-conformances ({len(filtered)})")
-                st.caption("Sorted BAR 1 first. Each No response appears once.")
-                st.dataframe(filtered.drop(columns=["Evidence","Immediate action"],errors="ignore"),use_container_width=True,hide_index=True)
-                repeat_df=(findings_df.groupby(["Finding","BAR"],dropna=False).agg(Occurrences=("Finding","size"),Sites=("Site",lambda x:", ".join(sorted({str(v) for v in x if v})))).reset_index().sort_values(["Occurrences","BAR"],ascending=[False,True]).head(5))
-                st.markdown("#### Most frequent failed questions (top five)")
-                st.dataframe(repeat_df,use_container_width=True,hide_index=True)
-            else:
-                st.success("No negative assurance responses in this view.")
-        if selected_view=="Assurance Insights":
-            st.markdown("**CoW Assurance Insights.** See what the audits found, which work-control checks need attention and what to do next."); c1,c2,c3=st.columns(3); c1.metric("Question conformance",format_percentage(q_conf(permit+tbt)),help="Yes answers divided by applicable Yes/No answers. N/A answers are excluded."); c2.metric("Permit whole-audit conformance",format_percentage(audit_conformance(permit,rounded=False)),help="Percentage of scored permit audits with no No answers. One No makes an audit non-conformant."); c3.metric("TBT/POP whole-audit conformance",format_percentage(audit_conformance(tbt,rounded=False)),help="Percentage of scored TBT/POP audits with no No answers.")
-            st.caption(checklist_compliance_basis(permit+tbt))
-            with st.expander("How to read these results"):
-                st.write("Question conformance measures individual Yes/No answers. Whole-audit conformance is the percentage of scored audits with no No answers. N/A answers are excluded. Themes group the failed checks; they do not establish causes or the condition of every barrier. Displayed percentages round upwards; RAG uses unrounded values.")
-            st.markdown("#### What needs attention")
-            st.info(nonconformance_narrative(permit+tbt))
-            with st.expander("Controls verified by Yes responses",expanded=False):
-                st.markdown("#### Controls verified by Yes responses")
-                positives=[{"Date":a["audit_date"],"Site / Team":a["site"],"Audit ID":a["audit_id"],"Question":r.get("question",""),"Ref":r.get("item","")} for a in permit+tbt for r in a["responses"] if str(r.get("response","")).lower()=="yes"]
-                if positives: st.dataframe(pd.DataFrame(positives),use_container_width=True,hide_index=True)
-                else: st.caption("No controls verified by a Yes response in the selected view.")
-                st.caption("Yes confirms checklist conformance; it does not by itself demonstrate exceptional practice. Non-conformances and actions remain the priority.")
-        if selected_view=="Human Factors":
-            from human_factors import render as render_hf_comment_themes
-            render_hf_comment_themes(permit+tbt+lead,period)
-        if selected_view=="Auditor View":
-            from kpi_rules import average_audit_conformance
-            st.subheader("Auditor results")
-            st.caption("Compare audit counts, average question scores and audit pass rates. Select an auditor below to review their BAR non-conformances.")
-            with st.expander("How auditor scores are calculated"):
-                st.write("Average question score is the mean of each audit’s Yes ÷ applicable Yes/No percentage, giving each audit equal weight. Audit pass rate is the percentage of scored audits with no No answers. N/A and unscored audits are excluded from percentages; all completed audits remain in the count.")
-            rr=[]
-            for n in sorted({a["auditor"] for a in permit+tbt+lead if a["auditor"]}):
-                aa=[a for a in permit+tbt+lead if a["auditor"]==n]; rr.append({"Auditor / Leader":n,"Audits completed":len(aa),"Average question score %":format_percentage(average_audit_conformance(aa)).removesuffix("%"),"Audit pass rate %":format_percentage(audit_conformance(aa,rounded=False)).removesuffix("%"),"Sites / Teams":", ".join(sorted({a["site"] for a in aa if a["site"]}))})
-            st.dataframe(pd.DataFrame(rr),use_container_width=True,hide_index=True) if rr else st.info("No auditor data.")
-            if rr:
-                with st.expander("What do the BAR levels mean?"):
-                    st.markdown("**BAR — Barrier Assurance Review.** Each audit question has a preset classification. A **No** records a non-conformance against that question. The BAR identifies the type of control being checked; it is not a separate score assigned to the finding.")
-                    st.markdown("**BAR 1 · Critical control verification:** checks a required control against major accident or serious harm. A No requires immediate action to make work safe.\n\n**BAR 2 · Operational control:** checks planning, understanding, supervision or how work is carried out. A No requires correction and tracking.\n\n**BAR 3 · Management and learning:** checks oversight, records, lessons or improvement follow-up. A No requires an improvement action.")
-                    st.caption("These are the demonstration definitions; question classifications require agreement before operational use.")
-                selected_auditor=st.selectbox("Auditor / Leader for BAR non-conformances",[row["Auditor / Leader"] for row in rr],key="bar-failure-auditor")
-                bar_context=(period,asset,site,selected_auditor)
-                if st.button("Show BAR non-conformances",key="show-auditor-bar-failures",type="primary"):
-                    st.session_state["_auditor_bar_context"]=bar_context
-                if st.session_state.get("_auditor_bar_context")==bar_context:
-                    failed=auditor_bar_failures(permit+tbt+lead,selected_auditor)
-                    st.markdown(f"#### BAR non-conformances · {selected_auditor}")
-                    st.caption(f"{len(failed)} non-conformances across {len({row['Audit ID'] for row in failed})} audit(s) · selected month and filters.")
-                    if failed:
-                        count_columns=st.columns(3)
-                        for column,bar in zip(count_columns,["BAR 1","BAR 2","BAR 3"]):
-                            column.metric(bar+" non-conformances",sum(row["BAR"]==bar for row in failed))
-                        for bar in ["BAR 1","BAR 2","BAR 3","Unrated"]:
-                            records=[row for row in failed if row["BAR"]==bar or (bar=="Unrated" and row["BAR"] not in {"BAR 1","BAR 2","BAR 3","Unrated"})]
-                            if records:
-                                with st.expander(f"{bar} · {len(records)} non-conformances",expanded=bar=="BAR 1"):
-                                    st.dataframe(pd.DataFrame(records),use_container_width=True,hide_index=True)
+                    first=min(d for _,d in dated).replace(day=1)
+                    last=max(max(d for _,d in dated),date.today()).replace(day=1)
+                    available_years=range(first.year,last.year+1)
+                    selected_year=st.selectbox("HISTORY PERIOD",["All recorded months"]+[str(yr) for yr in reversed(available_years)])
+                    months=[]
+                    cursor=first
+                    while cursor<=last:
+                        if selected_year=="All recorded months" or cursor.year==int(selected_year):months.append(cursor)
+                        cursor=date(cursor.year+1,1,1) if cursor.month==12 else date(cursor.year,cursor.month+1,1)
+                    dated=[(a,d) for a,d in dated if site=="All" or a["site"]==site]
+                    def history_counts(rows):
+                        aa=[a for a,_ in rows]
+                        permits=[a for a in aa if a["form_name"]=="Control of Work: Permit Quality"]
+                        eligible_lead=leadership_kpi_breakdown([a for a in aa if "Leadership Engagement" in a["form_name"]],lmap,nui_sites)["eligible"]
+                        count5=next((r[4] for r in reversed(history_k5) if r[2]==month_start.strftime("%Y-%m")),None)
+                        return {
+                            "KPI 1 Site Controller – Permit Quality":sum(permit_auditor_role(a,pmap)=="Site Controller" and permit_type(a)!="Unclassified" for a in permits),
+                            "KPI 2 Asset Superintendent – Permit Quality":sum(permit_auditor_role(a,pmap)=="Asset Superintendent" for a in permits),
+                            "KPI 3 Leadership CoW Engagements – Remote Site":len(eligible_lead),
+                            "KPI 4 Site Leadership – Permit compliance Remote Site":sum("Toolbox Talk" in a["form_name"] and tbt_auditor_role(a,tmap) in visit_roles and a["site"] in nui_sites for a in aa),
+                            "KPI 5 Permit-controlled Incidents":count5,
+                        }
+                    con=db(); history_k5=con.execute("SELECT * FROM kpi5 WHERE demo=0 AND site=? ORDER BY submitted_at",("All",)).fetchall(); con.close()
+                    monthly=[]
+                    for month_start in reversed(months):
+                        rows=[(a,d) for a,d in dated if d.year==month_start.year and d.month==month_start.month]
+                        monthly.append({"Month":month_start.strftime("%B %Y"),**history_counts(rows)})
+                    st.dataframe(pd.DataFrame(monthly),use_container_width=True,hide_index=True)
+                    st.caption("Monthly activity counts use eligible roles. These are activity counts, not historical KPI RAG ratings. KPI 5 is the company-wide rolling incident count.")
+            if selected_view=="Company & Site Performance":
+                st.subheader("Monthly performance by Site / Hub"); rows=[]
+                month_permit=[a for a in month if a["form_name"]=="Control of Work: Permit Quality" and permit_auditor_role(a,pmap)=="Site Controller"]
+                for g,(rw,nw) in selected_groups.items():
+                    aa=[a for a in month_permit if a["site"]==g]; routine=sum(permit_type(a)=="Routine" for a in aa); nonroutine=sum(permit_type(a)=="Non-routine" for a in aa); raw_done=routine+nonroutine; done=sum(r["Credited"] for r in monthly_report["weekly"] if r["KPI"]=="KPI 1" and r["Site / Hub"]==g); plan=(rw+nw)*w; pc=completion_percentage(done,plan) if plan else None; cf=audit_conformance([a for a in aa if permit_type(a)!="Unclassified"],rounded=False); status=rag(pc,cf)
+                    routine_weeks,_=weekly_coverage(aa,y,m,rw,lambda a:permit_type(a)=="Routine")
+                    nonroutine_weeks,_=weekly_coverage(aa,y,m,nw,lambda a:permit_type(a)=="Non-routine")
+                    if status=="Green" and (routine_weeks<w or nonroutine_weeks<w):status="Needs review"
+                    rows.append({"Site / Group":g,"Routine permits":f"{routine}/{rw*w}","Non-routine permits":f"{nonroutine}/{nw*w}","Recorded SC audits":len(aa),"Awaiting permit category verification":len(aa)-raw_done,"Planned":plan,"Eligible classified samples":done,"Completion %":round(pc,1) if pc is not None else None,"Whole-audit conformance %":round(cf,1) if cf is not None else None,"RAG":status})
+                st.dataframe(pd.DataFrame(rows),use_container_width=True,hide_index=True)
+                st.caption(f"Monthly basis: {w} reporting weeks. Only Site Controller audits with a recorded routine/non-routine category count toward planned samples. Permit Register source verification remains required. Blank completion and Not assessed mean there are no SC records at that site; they do not establish zero work in Permit Register.")
+                excluded=[a for a in month if a["form_name"]=="Control of Work: Permit Quality" and permit_auditor_role(a,pmap)!="Asset Superintendent" and (a["site"] not in SITE_GROUPS or permit_auditor_role(a,pmap)!="Site Controller" or permit_type(a)=="Unclassified")]
+                if excluded:
+                    st.markdown("#### Site Controller attribution or category review")
+                    st.dataframe(pd.DataFrame([{"Audit ID":a["audit_id"],"Date":a["audit_date"],"Entered location":a["site"],"Auditor role":permit_auditor_role(a,pmap),"Sample category":permit_type(a),"Reason":", ".join(x for x in ("Location outside SC groups" if a["site"] not in SITE_GROUPS else "","Auditor role requires verification" if permit_auditor_role(a,pmap)!="Site Controller" else "","Category not verified" if permit_type(a)=="Unclassified" else "") if x)} for a in excluded]),use_container_width=True,hide_index=True)
+                    with st.expander("Validate a historic permit record against Permit Register"):
+                        chosen_id=st.selectbox("Audit ID for correction",[a["audit_id"] for a in excluded],key=f"permit-fix-{period}")
+                        chosen=next(a for a in excluded if a["audit_id"]==chosen_id)
+                        with st.form(f"permit-correction-{chosen_id}"):
+                            c1,c2,c3=st.columns(3)
+                            corrected_site=c1.selectbox("Verified site / group",ASSET_GROUPS,index=ASSET_GROUPS.index(chosen["site"]) if chosen["site"] in ASSET_GROUPS else 0)
+                            corrected_role=c2.selectbox("Verified auditor role",["Site Controller","Asset Superintendent","Other"],index=["Site Controller","Asset Superintendent","Other"].index(permit_auditor_role(chosen,pmap)) if permit_auditor_role(chosen,pmap) in ["Site Controller","Asset Superintendent","Other"] else 2)
+                            corrected_category=c3.selectbox("Verified Permit Register category",["Routine","Non-routine"],index=["Routine","Non-routine"].index(permit_type(chosen)) if permit_type(chosen) in ["Routine","Non-routine"] else 0)
+                            correction_ref=st.text_input("Permit Register source reference / validation note")
+                            correct=st.form_submit_button("Save verified attribution")
+                        if correct:
+                            if not correction_ref.strip():st.error("Enter a Permit Register reference or validation note before changing an audit.")
+                            else:
+                                metadata=dict(chosen["metadata"])
+                                history=list(metadata.get("attribution_history") or [])
+                                history.append({"corrected_at":datetime.now().isoformat(timespec="seconds"),"source":correction_ref.strip(),"previous_site":chosen["site"],"previous_role":metadata.get("auditor_role"),"previous_category":metadata.get("permit_sample_category"),"site":corrected_site,"role":corrected_role,"category":corrected_category})
+                                metadata.update(site=corrected_site,auditor_role=corrected_role,permit_sample_category=corrected_category,attribution_history=history)
+                                c=db(); c.execute("UPDATE audits SET site=?,metadata=? WHERE audit_id=?",(corrected_site,json.dumps(metadata),chosen_id)); c.commit(); c.close(); st.rerun()
+            if selected_view=="Findings & Actions":
+                rows=[]
+                for a in permit+tbt+lead:
+                    for r in a["responses"]:
+                        if str(r.get("response","")).lower()!="no":
+                            continue
+                        rows.append({
+                            "BAR":r.get("bar_rating",""),
+                            "Date":a.get("audit_date",""),
+                            "Audit ID":a.get("audit_id",""),
+                            "Site":a.get("site",""),
+                            "Form":a.get("form_name",""),
+                            "Auditor":a.get("auditor",""),
+                            "Ref":r.get("item",""),
+                            "Finding":r.get("question",""),
+                            "Evidence":r.get("comments_evidence",""),
+                            "Immediate action":r.get("immediate_action",""),
+                            "SMART action":r.get("smart_action",""),
+                            "Owner":r.get("action_owner",""),
+                            "Due date":r.get("action_due_date",""),
+                        })
+                if rows:
+                    findings_df=pd.DataFrame(rows)
+                    findings_df["_bar_order"]=findings_df["BAR"].map({"BAR 1":1,"BAR 2":2,"BAR 3":3}).fillna(4)
+                    findings_df=findings_df.sort_values(["_bar_order","Date","Audit ID"],ascending=[True,False,True]).drop(columns="_bar_order")
+                    bar1_df=findings_df[findings_df["BAR"]=="BAR 1"]
+                    f1,f2,f3=st.columns([1,1,2])
+                    selected_bar=f1.selectbox("BAR level",["All","BAR 1","BAR 2","BAR 3"],key="findings-bar")
+                    selected_owner=f2.selectbox("Action owner",["All"]+sorted(set(findings_df["Owner"]) - {""}),key="findings-owner")
+                    search=f3.text_input("Search findings",placeholder="Question, site, auditor or action…",key="findings-search")
+                    filtered=findings_df.copy()
+                    if selected_bar!="All": filtered=filtered[filtered["BAR"]==selected_bar]
+                    if selected_owner!="All": filtered=filtered[filtered["Owner"]==selected_owner]
+                    if search.strip(): filtered=filtered[filtered.astype(str).apply(lambda col: col.str.contains(search.strip(),case=False,regex=False)).any(axis=1)]
+                    st.caption(f"Showing {len(filtered)} of {len(findings_df)} non-conformances in the selected reporting scope.")
+                    st.download_button("Download selected findings",filtered.drop(columns=["Evidence","Immediate action"],errors="ignore").to_csv(index=False).encode("utf-8-sig"),f"CoW_Findings_{period}.csv","text/csv",key="findings-download")
+                    bar1_df=filtered[filtered["BAR"]=="BAR 1"]
+                    st.markdown(f"#### BAR 1 non-conformances ({len(bar1_df)})")
+                    st.caption("BAR is assigned to the question, not separately to the finding.")
+                    if len(bar1_df):
+                        for finding in bar1_df.to_dict("records"):
+                            with st.container(border=True):
+                                st.markdown(f"**{finding['Ref'] or 'Question'} · {finding['Site']}**")
+                                st.caption(f"{finding['Date']} · {finding['Form']} · Audit {finding['Audit ID']}")
+                                st.write(finding["Finding"])
+                                st.markdown("**Evidence**")
+                                st.write(finding["Evidence"] or "Not recorded.")
+                                st.markdown("**Immediate safety action / current exposure**")
+                                st.write(finding["Immediate action"] or "Not recorded.")
+                                st.markdown("**SMART action**")
+                                st.write(finding["SMART action"] or "Not recorded.")
+                                st.caption(f"Owner: {finding['Owner'] or '—'} · Due: {finding['Due date'] or '—'}")
                     else:
-                        st.success("No BAR non-conformances for this auditor in the selected view.")
-
-        if selected_view=="KPI 5 Data":
-            st.subheader("KPI 5 · Company-wide Incident Register incident summary"); a,b,c=st.columns(3); current=a.number_input("Rolling 12-month permit-controlled incidents",0,999,0); prev=b.number_input("Previous rolling 12-month incidents",0,999,0); hipo=c.number_input("HiPO events",0,999,0); a,b,c=st.columns(3); injury=a.number_input("Significant injuries (MTC+)",0,999,0); loc=b.number_input("Loss of Containment",0,999,0); major=c.number_input("Major Loss of Containment",0,999,0); a,b,c=st.columns(3); repeat=a.selectbox("Repeat event theme?",["No","Yes"]); recurring=b.selectbox("Recurring permit-control failure?",["No","Yes"]); sig=c.selectbox("Significant increase?",["No","Yes"],help="No numerical threshold is assumed; use the agreed management assessment."); comments=st.text_area("Incident Register source, reviewed themes and leadership actions",height=220,help="Record the source, task and root-cause themes, interpretation, accountable action owners and follow-up. Structured counts above still drive the provisional KPI.")
-            if st.button("Save KPI 5 result",type="primary"):
-                if not comments.strip():st.error("Record the Incident Register tracking source and validation note before saving.")
+                        st.success("No failed BAR 1 questions in this view.")
+                    st.markdown(f"#### Selected non-conformances ({len(filtered)})")
+                    st.caption("Sorted BAR 1 first. Each No response appears once.")
+                    st.dataframe(filtered.drop(columns=["Evidence","Immediate action"],errors="ignore"),use_container_width=True,hide_index=True)
+                    repeat_df=(findings_df.groupby(["Finding","BAR"],dropna=False).agg(Occurrences=("Finding","size"),Sites=("Site",lambda x:", ".join(sorted({str(v) for v in x if v})))).reset_index().sort_values(["Occurrences","BAR"],ascending=[False,True]).head(5))
+                    st.markdown("#### Most frequent failed questions (top five)")
+                    st.dataframe(repeat_df,use_container_width=True,hide_index=True)
                 else:
-                    rid="KPI5-"+uuid.uuid4().hex[:8].upper(); con=db(); con.execute("INSERT INTO kpi5 VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)",(rid,datetime.now().isoformat(timespec="seconds"),period,"All",current,prev,hipo,injury,loc,major,repeat,recurring,sig,comments,0)); con.commit(); con.close(); st.success("KPI 5 result saved.")
-        if selected_view=="Leadership Report":
-            from monthly_report import report_controls
-            report_controls(db,monthly_report,asset+" / "+site,k5s)
-
-        if selected_view=="Detailed KPI Reports":
-            st.caption("Select a KPI below to review delivery, conformance, findings, targets and leadership actions.")
-            from leadership_views import render as render_leadership_details
-            detail_groups={g:v for g,v in selected_groups.items() if site=="All" or g==site}
-            detail_tbt=[a for a in tbt if a["site"] in {"North Remote Sites","South Remote Sites"} and tbt_auditor_role(a,tmap) in {"Operations Supervisor","HSE Adviser","Site Manager"}]
-            render_leadership_details(db,recovery_actions,period,asset+" / "+site,y,m,detail_groups,sc_samples,as_samples,qlead,detail_tbt,tmap,statuses,{"all_a":all_a,"pmap":pmap,"monthly_report":monthly_report})
-            with st.expander("Supporting delivery and accountability tables",expanded=False):
-                st.markdown('<div class="section-head">KPI 3 – Monthly and Three-month View</div>',unsafe_allow_html=True)
-                st.dataframe(pd.DataFrame(k3_month_rows),use_container_width=True,hide_index=True)
-                st.caption(f"Q{q} {y}: {k3n}/3 eligible engagements through {md.strftime('%B')}; quarter engagement conformance {format_percentage(k3c) if k3c is not None else '—'}; coverage {gov['kpi3_coverage']}. Monthly rows show contributions, while the RAG rating applies to the three-month quarter. Future months in the selected quarter are blank.")
-                with st.sidebar.expander("How the provisional position is calculated"):
-                    st.markdown("The provisional position shows the most adverse assessed KPI. It remains a demonstration indicator while source checks are incomplete. KPI 1 and KPI 2 use whole-permit conformance: one failed checklist item fails that permit audit, regardless of the question's preset BAR. Question BARs determine each form's result. KPI 3 uses eligible leadership engagement completion and whole-engagement conformance, with Remote Site coverage checked against Visit Register.")
-                st.subheader("Weekly Site Controller delivery")
-                weekly_rows=[]
-                for group,(routine_target,new_target) in selected_groups.items():
-                    if site!="All" and group!=site: continue
-                    for category,target in (("Routine",routine_target),("Non-routine",new_target)):
-                        records=[a for a in sc_samples if a["site"]==group and permit_type(a)==category]
-                        met,planned=weekly_coverage(records,y,m,target)
-                        weekly_rows.append({"Site / Hub":group,"Sample category":category,"Weekly target":target,"Weeks target met":met,"Weeks planned":planned,"Weeks below target":planned-met,"Recorded auditors":", ".join(sorted({a["auditor"] for a in records})),"Accountable role":"Site Controller / Site Leadership"})
-                st.dataframe(pd.DataFrame(weekly_rows),use_container_width=True,hide_index=True)
-                st.subheader("Accountability and required response")
-                account=[]
-                for i,(status,owner) in enumerate(zip(statuses,["Site Leadership","Operations Director","General Manager","Site Leadership / Operations Director","Operations Director"])):
-                    if status!="Green":
-                        account.append({"KPI":f"KPI {i+1}","Status":status,"Accountable role":owner,"Required response":"Validate source / target allocation" if status not in ("Red","Amber") else "Immediate intervention; actions within one month" if status=="Red" and i<4 else "Review performance and agree follow-up actions"})
-                if account: st.dataframe(pd.DataFrame(account),use_container_width=True,hide_index=True)
-                st.caption("Role accountability is shown above. Finding owners and due dates are in Findings & Actions. Named missed obligations require an approved rota/target allocation; recorded auditors alone do not establish who was due to audit.")
+                    st.success("No negative assurance responses in this view.")
+            if selected_view=="Assurance Insights":
+                st.markdown("**CoW Assurance Insights.** See what the audits found, which work-control checks need attention and what to do next."); c1,c2,c3=st.columns(3); c1.metric("Question conformance",format_percentage(q_conf(permit+tbt)),help="Yes answers divided by applicable Yes/No answers. N/A answers are excluded."); c2.metric("Permit whole-audit conformance",format_percentage(audit_conformance(permit,rounded=False)),help="Percentage of scored permit audits with no No answers. One No makes an audit non-conformant."); c3.metric("TBT/POP whole-audit conformance",format_percentage(audit_conformance(tbt,rounded=False)),help="Percentage of scored TBT/POP audits with no No answers.")
+                st.caption(checklist_compliance_basis(permit+tbt))
+                with st.expander("How to read these results"):
+                    st.write("Question conformance measures individual Yes/No answers. Whole-audit conformance is the percentage of scored audits with no No answers. N/A answers are excluded. Themes group the failed checks; they do not establish causes or the condition of every barrier. Displayed percentages round upwards; RAG uses unrounded values.")
+                st.markdown("#### What needs attention")
+                st.info(nonconformance_narrative(permit+tbt))
+                with st.expander("Controls verified by Yes responses",expanded=False):
+                    st.markdown("#### Controls verified by Yes responses")
+                    positives=[{"Date":a["audit_date"],"Site / Team":a["site"],"Audit ID":a["audit_id"],"Question":r.get("question",""),"Ref":r.get("item","")} for a in permit+tbt for r in a["responses"] if str(r.get("response","")).lower()=="yes"]
+                    if positives: st.dataframe(pd.DataFrame(positives),use_container_width=True,hide_index=True)
+                    else: st.caption("No controls verified by a Yes response in the selected view.")
+                    st.caption("Yes confirms checklist conformance; it does not by itself demonstrate exceptional practice. Non-conformances and actions remain the priority.")
+            if selected_view=="Human Factors":
+                from human_factors import render as render_hf_comment_themes
+                render_hf_comment_themes(permit+tbt+lead,period)
+            if selected_view=="Auditor View":
+                from kpi_rules import average_audit_conformance
+                st.subheader("Auditor results")
+                st.caption("Compare audit counts, average question scores and audit pass rates. Select an auditor below to review their BAR non-conformances.")
+                with st.expander("How auditor scores are calculated"):
+                    st.write("Average question score is the mean of each audit’s Yes ÷ applicable Yes/No percentage, giving each audit equal weight. Audit pass rate is the percentage of scored audits with no No answers. N/A and unscored audits are excluded from percentages; all completed audits remain in the count.")
+                rr=[]
+                for n in sorted({a["auditor"] for a in permit+tbt+lead if a["auditor"]}):
+                    aa=[a for a in permit+tbt+lead if a["auditor"]==n]; rr.append({"Auditor / Leader":n,"Audits completed":len(aa),"Average question score %":format_percentage(average_audit_conformance(aa)).removesuffix("%"),"Audit pass rate %":format_percentage(audit_conformance(aa,rounded=False)).removesuffix("%"),"Sites / Teams":", ".join(sorted({a["site"] for a in aa if a["site"]}))})
+                st.dataframe(pd.DataFrame(rr),use_container_width=True,hide_index=True) if rr else st.info("No auditor data.")
+                if rr:
+                    with st.expander("What do the BAR levels mean?"):
+                        st.markdown("**BAR — Barrier Assurance Review.** Each audit question has a preset classification. A **No** records a non-conformance against that question. The BAR identifies the type of control being checked; it is not a separate score assigned to the finding.")
+                        st.markdown("**BAR 1 · Critical control verification:** checks a required control against major accident or serious harm. A No requires immediate action to make work safe.\n\n**BAR 2 · Operational control:** checks planning, understanding, supervision or how work is carried out. A No requires correction and tracking.\n\n**BAR 3 · Management and learning:** checks oversight, records, lessons or improvement follow-up. A No requires an improvement action.")
+                        st.caption("These are the demonstration definitions; question classifications require agreement before operational use.")
+                    selected_auditor=st.selectbox("Auditor / Leader for BAR non-conformances",[row["Auditor / Leader"] for row in rr],key="bar-failure-auditor")
+                    bar_context=(period,asset,site,selected_auditor)
+                    if st.button("Show BAR non-conformances",key="show-auditor-bar-failures",type="primary"):
+                        st.session_state["_auditor_bar_context"]=bar_context
+                    if st.session_state.get("_auditor_bar_context")==bar_context:
+                        failed=auditor_bar_failures(permit+tbt+lead,selected_auditor)
+                        st.markdown(f"#### BAR non-conformances · {selected_auditor}")
+                        st.caption(f"{len(failed)} non-conformances across {len({row['Audit ID'] for row in failed})} audit(s) · selected month and filters.")
+                        if failed:
+                            count_columns=st.columns(3)
+                            for column,bar in zip(count_columns,["BAR 1","BAR 2","BAR 3"]):
+                                column.metric(bar+" non-conformances",sum(row["BAR"]==bar for row in failed))
+                            for bar in ["BAR 1","BAR 2","BAR 3","Unrated"]:
+                                records=[row for row in failed if row["BAR"]==bar or (bar=="Unrated" and row["BAR"] not in {"BAR 1","BAR 2","BAR 3","Unrated"})]
+                                if records:
+                                    with st.expander(f"{bar} · {len(records)} non-conformances",expanded=bar=="BAR 1"):
+                                        st.dataframe(pd.DataFrame(records),use_container_width=True,hide_index=True)
+                        else:
+                            st.success("No BAR non-conformances for this auditor in the selected view.")
+    
+            if selected_view=="KPI 5 Data":
+                st.subheader("KPI 5 · Company-wide Incident Register incident summary"); a,b,c=st.columns(3); current=a.number_input("Rolling 12-month permit-controlled incidents",0,999,0); prev=b.number_input("Previous rolling 12-month incidents",0,999,0); hipo=c.number_input("HiPO events",0,999,0); a,b,c=st.columns(3); injury=a.number_input("Significant injuries (MTC+)",0,999,0); loc=b.number_input("Loss of Containment",0,999,0); major=c.number_input("Major Loss of Containment",0,999,0); a,b,c=st.columns(3); repeat=a.selectbox("Repeat event theme?",["No","Yes"]); recurring=b.selectbox("Recurring permit-control failure?",["No","Yes"]); sig=c.selectbox("Significant increase?",["No","Yes"],help="No numerical threshold is assumed; use the agreed management assessment."); comments=st.text_area("Incident Register source, reviewed themes and leadership actions",height=220,help="Record the source, task and root-cause themes, interpretation, accountable action owners and follow-up. Structured counts above still drive the provisional KPI.")
+                if st.button("Save KPI 5 result",type="primary"):
+                    if not comments.strip():st.error("Record the Incident Register tracking source and validation note before saving.")
+                    else:
+                        rid="KPI5-"+uuid.uuid4().hex[:8].upper(); con=db(); con.execute("INSERT INTO kpi5 VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)",(rid,datetime.now().isoformat(timespec="seconds"),period,"All",current,prev,hipo,injury,loc,major,repeat,recurring,sig,comments,0)); con.commit(); con.close(); st.success("KPI 5 result saved.")
+            if selected_view=="Leadership Report":
+                from monthly_report import report_controls
+                report_controls(db,monthly_report,asset+" / "+site,k5s)
+    
+            if selected_view=="Detailed KPI Reports":
+                st.caption("Select a KPI below to review delivery, conformance, findings, targets and leadership actions.")
+                from leadership_views import render as render_leadership_details
+                detail_groups={g:v for g,v in selected_groups.items() if site=="All" or g==site}
+                detail_tbt=[a for a in tbt if a["site"] in {"North Remote Sites","South Remote Sites"} and tbt_auditor_role(a,tmap) in {"Operations Supervisor","HSE Adviser","Site Manager"}]
+                render_leadership_details(db,recovery_actions,period,asset+" / "+site,y,m,detail_groups,sc_samples,as_samples,qlead,detail_tbt,tmap,statuses,{"all_a":all_a,"pmap":pmap,"monthly_report":monthly_report})
+                with st.expander("Supporting delivery and accountability tables",expanded=False):
+                    st.markdown('<div class="section-head">KPI 3 – Monthly and Three-month View</div>',unsafe_allow_html=True)
+                    st.dataframe(pd.DataFrame(k3_month_rows),use_container_width=True,hide_index=True)
+                    st.caption(f"Q{q} {y}: {k3n}/3 eligible engagements through {md.strftime('%B')}; quarter engagement conformance {format_percentage(k3c) if k3c is not None else '—'}; coverage {gov['kpi3_coverage']}. Monthly rows show contributions, while the RAG rating applies to the three-month quarter. Future months in the selected quarter are blank.")
+                    st.subheader("Weekly Site Controller delivery")
+                    weekly_rows=[]
+                    for group,(routine_target,new_target) in selected_groups.items():
+                        if site!="All" and group!=site: continue
+                        for category,target in (("Routine",routine_target),("Non-routine",new_target)):
+                            records=[a for a in sc_samples if a["site"]==group and permit_type(a)==category]
+                            met,planned=weekly_coverage(records,y,m,target)
+                            weekly_rows.append({"Site / Hub":group,"Sample category":category,"Weekly target":target,"Weeks target met":met,"Weeks planned":planned,"Weeks below target":planned-met,"Recorded auditors":", ".join(sorted({a["auditor"] for a in records})),"Accountable role":"Site Controller / Site Leadership"})
+                    st.dataframe(pd.DataFrame(weekly_rows),use_container_width=True,hide_index=True)
+                    st.subheader("Accountability and required response")
+                    account=[]
+                    for i,(status,owner) in enumerate(zip(statuses,["Site Leadership","Operations Director","General Manager","Site Leadership / Operations Director","Operations Director"])):
+                        if status!="Green":
+                            account.append({"KPI":f"KPI {i+1}","Status":status,"Accountable role":owner,"Required response":"Validate source / target allocation" if status not in ("Red","Amber") else "Immediate intervention; actions within one month" if status=="Red" and i<4 else "Review performance and agree follow-up actions"})
+                    if account: st.dataframe(pd.DataFrame(account),use_container_width=True,hide_index=True)
+                    st.caption("Role accountability is shown above. Finding owners and due dates are in Findings & Actions. Named missed obligations require an approved rota/target allocation; recorded auditors alone do not establish who was due to audit.")
+        render_dashboard_views()
 
 st.caption("**DEMO ONLY · Fictional data · Temporary session · Do not enter confidential information**")
 import importlib, demo_audits
