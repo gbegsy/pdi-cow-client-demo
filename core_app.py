@@ -173,19 +173,6 @@ st.markdown("""
 }
 
 
-/* A compact five-card overview reduces scrolling during client demonstrations. */
-@media(min-width:1100px){
- [data-testid="stHorizontalBlock"]:has(.kpi){flex-wrap:nowrap!important;gap:12px}
- [data-testid="stHorizontalBlock"]:has(.kpi)>[data-testid="stColumn"]{flex:1 1 0!important;min-width:0!important}
- .kpi{height:440px!important;min-height:440px;grid-template-rows:14px 52px 150px 24px 40px minmax(58px,1fr);gap:6px;padding:12px}
- .kpi .ks{font-size:14px}
- .kpi .metric-pair{grid-template-rows:86px 56px;gap:8px}
- .kpi .metric-line strong{font-size:16px}
- .kpi .metric-line span{font-size:9px}
- .kpi .kd{font-size:11px;line-height:1.4}
-}
-.active-view{display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap;background:#15394f;color:white;padding:12px 16px;border-radius:8px;margin:12px 0}
-.active-view span{font-size:13px;color:#e0edf5}
 /* Single-view navigation: visible labels, large targets, no hidden offscreen tabs. */
 [data-testid="stRadio"] div[role="radiogroup"]{gap:8px}
 [data-testid="stRadio"] div[role="radiogroup"] label{border:1px solid #b8cbdc;background:white;border-radius:8px;padding:10px 14px;min-height:44px}
@@ -213,6 +200,20 @@ button:focus-visible,input:focus-visible,textarea:focus-visible,[role="combobox"
 .selection{border-radius:7px}
 .kpi{background:#fff}
 @media(max-width:650px){.dash{padding:16px}.dash h1{font-size:24px}[data-testid="stMetric"]{padding:12px}}
+
+/* A compact five-card overview reduces scrolling during client demonstrations. */
+@media(min-width:1100px){
+ [data-testid="stHorizontalBlock"]:has(.kpi){flex-wrap:nowrap!important;gap:12px}
+ [data-testid="stHorizontalBlock"]:has(.kpi)>[data-testid="stColumn"]{flex:1 1 0!important;min-width:0!important}
+ .kpi{height:440px!important;min-height:440px;grid-template-rows:14px 52px 150px 24px 40px minmax(58px,1fr);gap:6px;padding:12px}
+ .kpi .ks{font-size:14px}
+ .kpi .metric-pair{grid-template-rows:86px 56px;gap:8px}
+ .kpi .metric-line strong{font-size:16px}
+ .kpi .metric-line span{font-size:9px}
+ .kpi .kd{font-size:11px;line-height:1.4}
+}
+.active-view{display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap;background:#15394f;color:white;padding:12px 16px;border-radius:8px;margin:12px 0}
+.active-view span{font-size:13px;color:#e0edf5}
 
 </style>
 """, unsafe_allow_html=True)
