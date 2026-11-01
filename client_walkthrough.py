@@ -32,6 +32,24 @@ def snapshot(rows, statuses):
     c1.metric('KPIs requiring attention', sum(s in ('Red', 'Amber') for s in statuses))
     c2.metric('Audits with non-conformances', len({a['audit_id'] for a, _ in failed}))
     c3.metric('BAR 1 non-conformances', sum(r.get('bar_rating') == 'BAR 1' for _, r in failed))
+    with c3.popover(f"Reveal BAR 1 non-conformances ({sum(r.get('bar_rating') == 'BAR 1' for _, r in failed)})",use_container_width=True):
+        st.markdown("### BAR 1 · Critical control verification")
+        critical=[(a,r) for a,r in failed if r.get('bar_rating')=='BAR 1']
+        if not critical:
+            st.success("No BAR 1 non-conformances in the selected reporting scope.")
+        for audit, finding in critical:
+            with st.container(border=True):
+                st.markdown(f"**{finding.get('item','')} · {audit['site']}**")
+                st.caption(f"{audit['audit_date']} · {audit['audit_id']} · {audit['auditor']}")
+                st.write(finding.get('question',''))
+                st.markdown("**Recorded evidence**")
+                st.write(finding.get('comments_evidence') or 'Not recorded')
+                st.markdown("**Immediate safety action**")
+                st.write(finding.get('immediate_action') or 'Not recorded — verify current exposure')
+                st.markdown("**Required follow-up**")
+                st.write(finding.get('smart_action') or 'Not recorded')
+                st.caption(f"Owner: {finding.get('action_owner') or 'Unassigned'} · Due: {finding.get('action_due_date') or 'Not recorded'}")
+        st.caption("A recorded action does not demonstrate that the control has been restored; check the verification evidence.")
     st.write(f"**Performance:** Red: {red or 'None'} · Amber: {amber or 'None'}.")
     if failed:
         repeated = Counter(r.get('question', '') for _, r in failed)
