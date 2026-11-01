@@ -55,6 +55,61 @@ def comment_records(audits):
     return out
 
 
+
+def leadership_narrative(audits, period):
+    """Evidence-bounded briefing; theme mentions are not causal classifications."""
+    rows = comment_records(audits)
+    if not rows:
+        return "No substantive audit comments are available for an HF leadership narrative in this reporting scope."
+    counts = Counter(theme for row in rows for theme in row["_themes"])
+    audits_with_comments = len({row["Audit ID"] for row in rows})
+    sites = len({row["Site / Team"] for row in rows if row["Site / Team"]})
+    topics = ", ".join(f"{theme.lower()} ({count} comment entries)" for theme, count in counts.most_common(3))
+    paragraphs = [
+        f"**Evidence base · {period}:** {len(rows)} substantive comment entries from {audits_with_comments} audits across {sites} site/team locations in the selected reporting scope.",
+        "**What the comments mention:** "+(topics+"." if topics else "No recognised HF themes; read the source accounts before drawing conclusions."),
+    ]
+    helpful = [row for row in rows if re.search(r"\\b(helped|worked well|made easier|useful)\\b", row["Original comment"], re.I)]
+    if helpful:
+        paragraphs.append(f"**What may be worth retaining:** {len(helpful)} comment entries contain explicit wording about what helped or was useful. Review these accounts for practices that could be shared; this wording alone is not a verified effectiveness assessment.")
+    actions = {
+        "Equipment and workplace access": "Check worksite access, tool availability and equipment information with the crews before the next task.",
+        "Communication and handover": "Check that handovers and toolbox talks convey task changes, restrictions and stop-work conditions; ask crews to explain their understanding.",
+        "Supervision and support": "Discuss whether supervisors have the information, time and resources to resolve uncertainties before work starts.",
+        "Procedures and information": "Review the referenced procedures, drawings and work packs with users; resolve conflicting or unclear instructions.",
+        "Time, workload and staffing": "Explore workload and scheduling with the teams and check whether work plans allow time for safe preparation and handover.",
+        "Competence and familiarity": "Check task familiarity and access to support through practical discussion; do not infer an individual competence failure from a wording match.",
+        "Adaptations and what helped": "Review adaptations with the workforce to distinguish useful practice from changes needing formal assessment.",
+    }
+    suggested = [actions[theme] for theme, _ in counts.most_common(3)]
+    if suggested:
+        paragraphs.append("**Leadership follow-up:** "+" ".join(suggested)+" Assign a named owner and due date to any agreed improvement, then use a follow-up visit or audit to verify it.")
+    paragraphs.append("**Interpretation:** These are overlapping mentions in recorded comments, including difficulties, helpful practices and suggestions. They do not establish causes, workforce prevalence or barrier effectiveness. Original audit scores remain unchanged.")
+    return "\\n\\n".join(paragraphs)
+
+
+def render_leadership_narrative(audits, period, key="hf-leadership"):
+    import streamlit as st
+    text = leadership_narrative(audits, period)
+    st.markdown("#### Human Factors · Leadership narrative")
+    st.markdown(text)
+    with st.expander("Source examples behind this narrative"):
+        rows = comment_records(audits)
+        seen = set()
+        for row in rows:
+            comment = row["Original comment"]
+            if comment in seen or not row["_themes"]:
+                continue
+            seen.add(comment)
+            st.write(comment)
+            st.caption(f'{row["Audit ID"]} · {row["Site / Team"]} · {row["Source reference"]} · Suggested themes: {row["Potential themes"]}')
+            if len(seen) == 3:
+                break
+        if not seen:
+            st.caption("No source examples with a suggested theme in this reporting scope.")
+    st.download_button("Download HF leadership narrative",text.encode("utf-8"),"CoW_HF_Leadership_"+period+".md","text/markdown",key=key+"-download")
+
+
 def render(audits, period):
     import streamlit as st
     import pandas as pd
@@ -65,6 +120,7 @@ def render(audits, period):
     if not rows:
         st.info("Insufficient narrative evidence. No substantive comments are recorded in this selection. Yes/No answers and question wording are not used to invent HF themes.")
         return
+    render_leadership_narrative(audits, period)
     counts = Counter(theme for row in rows for theme in row["_themes"])
     domain_counts = Counter(domain for row in rows for domain in row["_domains"])
     st.markdown("#### Themes to explore with the workforce")
