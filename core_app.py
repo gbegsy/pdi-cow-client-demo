@@ -173,6 +173,19 @@ st.markdown("""
 }
 
 
+/* A compact five-card overview reduces scrolling during client demonstrations. */
+@media(min-width:1100px){
+ [data-testid="stHorizontalBlock"]:has(.kpi){flex-wrap:nowrap!important;gap:12px}
+ [data-testid="stHorizontalBlock"]:has(.kpi)>[data-testid="stColumn"]{flex:1 1 0!important;min-width:0!important}
+ .kpi{height:440px!important;min-height:440px;grid-template-rows:14px 52px 150px 24px 40px minmax(58px,1fr);gap:6px;padding:12px}
+ .kpi .ks{font-size:14px}
+ .kpi .metric-pair{grid-template-rows:86px 56px;gap:8px}
+ .kpi .metric-line strong{font-size:16px}
+ .kpi .metric-line span{font-size:9px}
+ .kpi .kd{font-size:11px;line-height:1.4}
+}
+.active-view{display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap;background:#15394f;color:white;padding:12px 16px;border-radius:8px;margin:12px 0}
+.active-view span{font-size:13px;color:#e0edf5}
 /* Single-view navigation: visible labels, large targets, no hidden offscreen tabs. */
 [data-testid="stRadio"] div[role="radiogroup"]{gap:8px}
 [data-testid="stRadio"] div[role="radiogroup"] label{border:1px solid #b8cbdc;background:white;border-radius:8px;padding:10px 14px;min-height:44px}
@@ -624,6 +637,7 @@ def recovery_actions(period, scope, kpi_filter=None):
 
 def dashboard():
     st.markdown(f'<div class="dash"><div class="brand-row"><strong style="font-size:25px">PDi | VERIFY</strong><div class="eyebrow">PDi DEMO | OPERATIONAL ASSURANCE</div></div><h1>Control of Work KPI Dashboard</h1><p>Client demonstration · fictional assurance data</p></div>',unsafe_allow_html=True)
+    st.caption("Demo route: KPI overview → Evidence Trail → Human Factors → Leadership Report. Use Improvement Scenario to explore potential gains.")
     global DB, DATABASE_URL, _SCHEMA_READY
     demo_mode=True
     all_a=[a for a in audits() if not a["audit_id"].startswith("DEMO-") and not a["metadata"].get("demo") and not a["metadata"].get("uat_sample")]
@@ -885,12 +899,13 @@ def dashboard():
             if k5 and not (k5[13] or "").strip():st.warning("Incident Register source note missing; result needs validation. Any Red incident trigger remains visible.")
             k5_reason=("Incident severity or recurring-control criterion triggered" if k5s=="Red" else f"Increase from {prev} to {current}" if k5s=="Amber" and current>prev else "Incident warning criterion triggered" if k5s=="Amber" else "Source note needs validation" if k5s=="Needs review" else "No adverse incident trigger" if k5s=="Green" else "Incident Register summary needed")
             measure_card("KPI 5","Permit-Controlled Incidents","Rolling 12-month count",k5v,"Previous 12-month count",str(prev) if k5 else "—",k5s,k5_reason,"Synthetic UAT scenario" if k5_synthetic else "Company-wide Incident Register source required")
-            st.button("Open KPI 5 evidence",key="open-kpi-5",use_container_width=True,on_click=open_demo_evidence,args=("KPI 5",))
+            st.button("Open KPI 5 reports",key="open-kpi-5",use_container_width=True,on_click=open_demo_evidence,args=("KPI 5",))
             with st.expander("KPI Targets & Tolerances"):
                 st.markdown("**Measure and target**\nReport incidents confirmed as occurring during permit-controlled activities over a **rolling 12-month period**, with identification of HiPOs, losses of containment and significant injuries (MTC or above). Use reviewed Incident Register records and the Incident Register tracking spreadsheet.\n\n**Green:** No increase in the rolling 12-month incident trend. No HiPOs, significant injuries (MTC or above), or repeat loss-of-containment events identified. No intervention required; continue monitoring and discussion through Monthly Operations and QSHE meetings.\n\n**Amber:** Increasing incident trend, a single HiPO, significant injury, loss of containment, or a repeat event theme identified within the reporting period. Operations Director intervention through targeted campaigns, assurance activities or focused reviews to address identified themes.\n\n**Red:** Significant increase in incidents, multiple HiPOs, significant injuries (MTC or above), major loss-of-containment events, or evidence of recurring failures in permit controls. Immediate General Manager intervention; investigation findings, learning actions and improvement measures implemented and tracked to closure.")
         st.markdown("### Explore the assurance data")
         st.caption("Start with insights → open a detailed KPI → review findings and owners → present the leadership report. All views use the month, asset and site selected above.")
-        selected_view=st.radio("Choose a data view",["Assurance Insights","Leadership Report","Detailed KPI Reports","Findings & Actions","Auditor View","Company & Site Performance","Monthly History","KPI 5 Data","Human Factors","Evidence Trail","Improvement Scenario"],horizontal=True,key="dashboard-data-view",label_visibility="collapsed")
+        selected_view=st.radio("Choose a data view",["Assurance Insights","Detailed KPI Reports","Evidence Trail","Findings & Actions","Human Factors","Leadership Report","Improvement Scenario","Auditor View","Company & Site Performance","Monthly History","KPI 5 Data"],horizontal=True,key="dashboard-data-view",label_visibility="collapsed")
+        st.markdown(f'<div class="active-view"><strong>Viewing: {html.escape(selected_view)}</strong><span>{md.strftime("%B %Y")} · {html.escape(asset)} · {html.escape(site)}</span></div>',unsafe_allow_html=True)
         evidence_groups={
             "KPI 1 · Site Controller":sc_samples,
             "KPI 2 · Asset Superintendent":as_samples,
