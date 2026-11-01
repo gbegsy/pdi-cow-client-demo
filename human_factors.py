@@ -69,7 +69,7 @@ def leadership_narrative(audits, period):
         f"**Evidence base · {period}:** {len(rows)} substantive comment entries from {audits_with_comments} audits across {sites} site/team locations in the selected reporting scope.",
         "**What the comments mention:** "+(topics+"." if topics else "No recognised HF themes; read the source accounts before drawing conclusions."),
     ]
-    helpful = [row for row in rows if re.search(r"\\b(helped|worked well|made easier|useful)\\b", row["Original comment"], re.I)]
+    helpful = [row for row in rows if re.search(r"\b(helped|worked well|made easier|useful)\b", row["Original comment"], re.I)]
     if helpful:
         paragraphs.append(f"**What may be worth retaining:** {len(helpful)} comment entries contain explicit wording about what helped or was useful. Review these accounts for practices that could be shared; this wording alone is not a verified effectiveness assessment.")
     actions = {
@@ -85,7 +85,7 @@ def leadership_narrative(audits, period):
     if suggested:
         paragraphs.append("**Leadership follow-up:** "+" ".join(suggested)+" Assign a named owner and due date to any agreed improvement, then use a follow-up visit or audit to verify it.")
     paragraphs.append("**Interpretation:** These are overlapping mentions in recorded comments, including difficulties, helpful practices and suggestions. They do not establish causes, workforce prevalence or barrier effectiveness. Original audit scores remain unchanged.")
-    return "\\n\\n".join(paragraphs)
+    return "\n\n".join(paragraphs)
 
 
 def render_leadership_narrative(audits, period, key="hf-leadership"):
