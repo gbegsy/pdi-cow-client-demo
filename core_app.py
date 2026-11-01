@@ -1112,6 +1112,8 @@ def dashboard():
             if selected_view=="Leadership Report":
                 from monthly_report import report_controls
                 report_controls(db,monthly_report,asset+" / "+site,k5s)
+                from human_factors import render_leadership_narrative
+                render_leadership_narrative(permit+tbt+lead,period,key="monthly-hf-leadership")
     
             if selected_view=="Detailed KPI Reports":
                 st.caption("Select a KPI below to review delivery, conformance, findings, targets and leadership actions.")
