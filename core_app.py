@@ -304,6 +304,11 @@ h2,h3,h4{color:#102d42;letter-spacing:-.35px}
 @media(max-width:1120px){.summary{grid-template-columns:repeat(2,minmax(0,1fr))}.summary-main{grid-column:span 2}}
 @media(max-width:650px){.dash{padding:20px}.dash h1{font-size:26px}.summary{grid-template-columns:1fr}.summary-main{grid-column:auto}.summary-main,.summary-stat{min-height:0}.st-key-dashboard-navigation{padding:13px!important}.active-view{gap:6px}}
 
+
+.st-key-dashboard-navigation label[data-selected="true"]>div>div:first-child,
+[data-testid="stSidebar"] label[data-selected="true"]>div>div:first-child{
+ background-color:#147c87!important;border-color:#147c87!important
+}
 </style>
 """, unsafe_allow_html=True)
 
