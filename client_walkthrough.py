@@ -1,5 +1,4 @@
 """Demo presentation views; never modify stored assurance records."""
-import math
 from collections import Counter
 
 
@@ -12,14 +11,6 @@ def open_demo_evidence(label):
 
 def scored(rows):
     return [(a, [r for r in a.get('responses', []) if r.get('response') in ('Yes', 'No')]) for a in rows if any(r.get('response') in ('Yes', 'No') for r in a.get('responses', []))]
-
-
-def conformance_scenario(rows, corrected):
-    records = scored(rows)
-    passed = sum(all(r['response'] == 'Yes' for r in responses) for _, responses in records)
-    failed = len(records) - passed
-    corrected = max(0, min(int(corrected), failed))
-    return passed, failed, (100 * (passed + corrected) / len(records) if records else None)
 
 
 def snapshot(rows, statuses):
@@ -130,32 +121,4 @@ def evidence_trail(groups, period, key_prefix="trail"):
         st.caption('No comment with a suggested HF theme in this audit.')
     st.caption('Comments are associated with the selected audit; this does not establish that they caused any non-conformance.')
 
-
-def improvement_scenario(groups):
-    import streamlit as st
-    from kpi_rules import format_percentage
-    st.subheader('What would improve this?')
-    st.info('ILLUSTRATIVE SCENARIO · Stored audits, actions and reported KPI ratings remain unchanged.')
-    label = st.selectbox('Choose an audit conformance measure', list(groups), key='scenario-kpi')
-    rows = groups[label]
-    passed, failed, current = conformance_scenario(rows, 0)
-    if current is None:
-        st.info('No scored audits in this selection.')
-        return
-    corrected = st.slider('Audits assumed fully corrected and verified', 0, failed, 0, key='scenario-corrected-'+label) if failed else 0
-    _, _, projected = conformance_scenario(rows, corrected)
-    a, b = st.columns(2)
-    a.metric('Recorded whole-audit conformance', format_percentage(current))
-    b.metric('Illustrative corrected position', format_percentage(projected))
-    required = max(0, math.ceil(0.9 * (passed + failed)) - passed)
-    st.write(f'**90% conformance threshold:** {required} of {failed} non-conformant audits would need every No response corrected and verified, on this fixed sample.')
-    st.write(f'**Scenario:** {passed+corrected}/{passed+failed} audits fully conformant, compared with {passed}/{passed+failed} recorded.')
-    st.caption('A follow-up verification is assumed for illustration. Original audit results remain a historical record. This is a conformance-only scenario: missed delivery, visit coverage, source checks and incident measures can still prevent an overall Green KPI.')
-
-def evidence_popup(groups, period, key_prefix):
-    import streamlit as st
-    @st.fragment
-    def popup_body():
-        evidence_trail(groups, period, key_prefix=key_prefix)
-    popup_body()
 
