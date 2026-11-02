@@ -52,7 +52,8 @@ def snapshot(rows, statuses):
                 st.caption(f"Owner: {finding.get('action_owner') or 'Unassigned'} · Due: {finding.get('action_due_date') or 'Not recorded'}")
         st.caption("A recorded action does not demonstrate that the control has been restored; check the verification evidence.")
     st.markdown("**BAR definitions**",help="BAR — Barrier Assurance Review\n\nBAR 1 · Critical control verification: checks required controls against major accident or serious harm. A No requires immediate action to make work safe.\n\nBAR 2 · Operational control: checks planning, understanding, supervision and how work is carried out. A No requires correction and tracking.\n\nBAR 3 · Management and learning: checks oversight, records, lessons and improvement follow-up. A No requires an improvement action.\n\nThe BAR is assigned to the audit question, not separately scored against the finding. Demonstration classifications require client agreement.")
-    with st.expander("Leadership briefing · priorities and interpretation",expanded=False):
+    with st.container(border=True,key="leadership-briefing"):
+        st.markdown("### Leadership briefing")
         st.write(f"**Performance:** Red: {red or 'None'} · Amber: {amber or 'None'}.")
         if failed:
             repeated=Counter(r.get('question','') for _,r in failed)
