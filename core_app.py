@@ -215,6 +215,33 @@ button:focus-visible,input:focus-visible,textarea:focus-visible,[role="combobox"
 .active-view{display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap;background:#15394f;color:white;padding:12px 16px;border-radius:8px;margin:12px 0}
 .active-view span{font-size:13px;color:#e0edf5}
 
+
+/* Prominent review navigation, scoped to this dashboard section. */
+.st-key-dashboard-navigation{
+ background:linear-gradient(135deg,#e5eef7,#f2f7fb);
+ border:2px solid #779bb8!important;border-top:6px solid #15394f!important;
+ border-radius:14px!important;padding:18px!important;
+ box-shadow:0 5px 18px #15394f18;margin:16px 0 12px
+}
+.st-key-dashboard-navigation h3{color:#102f4b;font-size:24px}
+.st-key-dashboard-navigation [role="radiogroup"]{gap:10px!important}
+.st-key-dashboard-navigation [role="radiogroup"] label{
+ background:#fff!important;border:2px solid #8aa9c1!important;
+ border-radius:9px!important;padding:13px 16px!important;min-height:52px!important;
+ box-shadow:0 2px 5px #15394f12;color:#15394f!important;
+ transition:background .15s,border-color .15s
+}
+.st-key-dashboard-navigation [role="radiogroup"] label p{font-weight:650;font-size:14px}
+.st-key-dashboard-navigation [role="radiogroup"] label:hover{
+ background:#d9eaf6!important;border-color:#246590!important
+}
+.st-key-dashboard-navigation [role="radiogroup"] label:has(input:checked){
+ background:#15394f!important;border-color:#15394f!important;
+ box-shadow:0 3px 8px #15394f35;color:#fff!important
+}
+.st-key-dashboard-navigation [role="radiogroup"] label:has(input:checked) p{color:#fff!important;font-weight:750}
+.st-key-dashboard-navigation [role="radiogroup"] label:focus-within{outline:3px solid #1886ba;outline-offset:3px}
+
 </style>
 """, unsafe_allow_html=True)
 
@@ -905,9 +932,10 @@ def dashboard():
                 st.markdown("**Measure and target**\nReport incidents confirmed as occurring during permit-controlled activities over a **rolling 12-month period**, with identification of HiPOs, losses of containment and significant injuries (MTC or above). Use reviewed Incident Register records and the Incident Register tracking spreadsheet.\n\n**Green:** No increase in the rolling 12-month incident trend. No HiPOs, significant injuries (MTC or above), or repeat loss-of-containment events identified. No intervention required; continue monitoring and discussion through Monthly Operations and QSHE meetings.\n\n**Amber:** Increasing incident trend, a single HiPO, significant injury, loss of containment, or a repeat event theme identified within the reporting period. Operations Director intervention through targeted campaigns, assurance activities or focused reviews to address identified themes.\n\n**Red:** Significant increase in incidents, multiple HiPOs, significant injuries (MTC or above), major loss-of-containment events, or evidence of recurring failures in permit controls. Immediate General Manager intervention; investigation findings, learning actions and improvement measures implemented and tracked to closure.")
         @st.fragment
         def render_dashboard_views():
-            st.markdown("### Explore the assurance data")
-            st.caption("Start with insights → open a detailed KPI → review findings and owners → present the leadership report. All views use the month, asset and site selected above.")
-            selected_view=st.radio("Choose a data view",["Assurance Insights","Detailed KPI Reports","Evidence Trail","Findings & Actions","Human Factors","Leadership Report","Improvement Scenario","Auditor View","Company & Site Performance","Monthly History","KPI 5 Data"],horizontal=True,key="dashboard-data-view",label_visibility="collapsed")
+            with st.container(border=True,key="dashboard-navigation"):
+                st.markdown("### Explore the assurance data")
+                st.caption("Start with insights → open a detailed KPI → review findings and owners → present the leadership report. All views use the month, asset and site selected above.")
+                selected_view=st.radio("Choose a data view",["Assurance Insights","Detailed KPI Reports","Evidence Trail","Findings & Actions","Human Factors","Leadership Report","Improvement Scenario","Auditor View","Company & Site Performance","Monthly History","KPI 5 Data"],horizontal=True,key="dashboard-data-view",label_visibility="collapsed")
             st.markdown(f'<div class="active-view"><strong>Viewing: {html.escape(selected_view)}</strong><span>{md.strftime("%B %Y")} · {html.escape(asset)} · {html.escape(site)}</span></div>',unsafe_allow_html=True)
             evidence_groups={
                 "KPI 1 · Site Controller":sc_samples,
