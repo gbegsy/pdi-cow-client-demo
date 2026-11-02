@@ -27,11 +27,12 @@ def snapshot(rows, statuses):
     failed = [(a, r) for a in rows for r in a.get('responses', []) if r.get('response') == 'No']
     red = ', '.join(f'KPI {i+1}' for i, status in enumerate(statuses) if status == 'Red')
     amber = ', '.join(f'KPI {i+1}' for i, status in enumerate(statuses) if status == 'Amber')
-    st.markdown('### Your CoW position in 60 seconds')
-    c1, c2, c3 = st.columns(3)
-    c1.metric('KPIs requiring attention', sum(s in ('Red', 'Amber') for s in statuses))
-    c2.metric('Audits with non-conformances', len({a['audit_id'] for a, _ in failed}))
-    c3.metric('BAR 1 non-conformances', sum(r.get('bar_rating') == 'BAR 1' for _, r in failed))
+    st.markdown('<div class="review-heading"><span class="eyebrow">LEADERSHIP FOCUS</span><h3>Your assurance priorities</h3></div>',unsafe_allow_html=True)
+    c1,c3=st.columns([2.7,1.5])
+    failed_audits=len({a['audit_id'] for a,_ in failed})
+    critical_count=sum(r.get('bar_rating')=='BAR 1' for _,r in failed)
+    c1.markdown(f"**{failed_audits} audits contain non-conformances · {critical_count} BAR 1 findings.**")
+    c1.caption("Confirm critical controls are safe, agree accountable actions, and verify corrections.")
     with c3.popover(f"Reveal BAR 1 non-conformances ({sum(r.get('bar_rating') == 'BAR 1' for _, r in failed)})",use_container_width=True):
         st.markdown("### BAR 1 · Critical control verification")
         critical=[(a,r) for a,r in failed if r.get('bar_rating')=='BAR 1']
@@ -51,15 +52,16 @@ def snapshot(rows, statuses):
                 st.caption(f"Owner: {finding.get('action_owner') or 'Unassigned'} · Due: {finding.get('action_due_date') or 'Not recorded'}")
         st.caption("A recorded action does not demonstrate that the control has been restored; check the verification evidence.")
     st.markdown("**BAR definitions**",help="BAR — Barrier Assurance Review\n\nBAR 1 · Critical control verification: checks required controls against major accident or serious harm. A No requires immediate action to make work safe.\n\nBAR 2 · Operational control: checks planning, understanding, supervision and how work is carried out. A No requires correction and tracking.\n\nBAR 3 · Management and learning: checks oversight, records, lessons and improvement follow-up. A No requires an improvement action.\n\nThe BAR is assigned to the audit question, not separately scored against the finding. Demonstration classifications require client agreement.")
-    st.write(f"**Performance:** Red: {red or 'None'} · Amber: {amber or 'None'}.")
-    if failed:
-        repeated = Counter(r.get('question', '') for _, r in failed)
-        question, count = repeated.most_common(1)[0]
-        st.write(f'**Assurance priority:** The most frequently failed check appears {count} times: {question}')
-        st.write('**Leadership decision:** Confirm the response to critical-control gaps, agree owners and dates for recurring findings, and address missed assurance delivery. Use the evidence trail to review the source records.')
-    else:
-        st.write('No No responses in the selected audit sample. Check delivery and source coverage before drawing a wider assurance conclusion.')
-    st.caption('Selected reporting scope · Fictional demonstration · Checklist results describe the audit sample.')
+    with st.expander("Leadership briefing · priorities and interpretation",expanded=False):
+        st.write(f"**Performance:** Red: {red or 'None'} · Amber: {amber or 'None'}.")
+        if failed:
+            repeated=Counter(r.get('question','') for _,r in failed)
+            question,count=repeated.most_common(1)[0]
+            st.write(f"**Most frequently failed check:** {count} occurrences. {question}")
+            st.write("**Leadership decision:** Confirm the response to critical-control gaps, agree owners and dates for recurring findings, and address missed assurance delivery.")
+        else:
+            st.write("No No responses in the selected audit sample. Check delivery and source coverage before drawing a wider assurance conclusion.")
+        st.caption("Selected reporting scope · Fictional demonstration · Results describe the audit sample.")
 
 
 def evidence_trail(groups, period, key_prefix="trail"):
