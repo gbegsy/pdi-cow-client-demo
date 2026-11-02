@@ -64,6 +64,38 @@ def snapshot(rows, statuses):
         st.caption("Selected reporting scope · Fictional demonstration · Results describe the audit sample.")
 
 
+
+def repeated_checks(audits):
+    """Repeat findings in the selected audit sample, never a deviance score."""
+    grouped={}
+    for audit in audits:
+        for response in audit.get("responses",[]):
+            if response.get("response")!="No":
+                continue
+            key=(audit.get("form_name",""),response.get("item",""),response.get("question",""))
+            item=grouped.setdefault(key,{"Question reference":key[1],"Repeated check":key[2],"Audit type":key[0],"_audits":set(),"_sites":set()})
+            item["_audits"].add(audit.get("audit_id",""))
+            item["_sites"].add(audit.get("site",""))
+    return [{"Question reference":r["Question reference"],"Repeated check":r["Repeated check"],"Audit type":r["Audit type"],"Audits with a No":len(r["_audits"]),"Sites / teams":", ".join(sorted(r["_sites"]))} for r in sorted(grouped.values(),key=lambda r:-len(r["_audits"])) if len(r["_audits"])>1]
+
+
+def normalisation_background(audits):
+    import streamlit as st
+    import pandas as pd
+    st.markdown("#### From repeated findings to a leadership question")
+    st.write("**Normalisation of deviance** is the gradual acceptance of departures from the required standard as normal practice. This evidence trail helps leaders investigate whether a recurring gap is being tolerated.")
+    repeats=repeated_checks(audits)
+    st.caption(f"{len(repeats)} checks have a No in more than one contributing audit in this selection. This is a repeat-finding count, not a normalisation score.")
+    with st.expander("Normalisation background · how to use this evidence"):
+        st.markdown("**1 · Establish the standard:** read the audit question and the applicable task requirement.\n\n**2 · Compare work as done:** open an audit and review the actual finding, recorded comments and immediate response.\n\n**3 · Explore acceptance:** ask the workforce and supervisors whether the departure is familiar, routinely tolerated or justified because nothing has gone wrong. Check whether there is an approved change or a practical obstacle to meeting the standard.\n\n**4 · Act and verify:** agree a workable correction, named owner and due date, then check implementation and recurrence through follow-up assurance.")
+        if repeats:
+            st.dataframe(pd.DataFrame(repeats[:5]),hide_index=True,use_container_width=True)
+            st.caption("Top five repeated checks in the contributing audits. Multiple failed answers from one audit do not create extra audit occurrences for the same check.")
+        st.info("Repeated non-conformance alone does not prove normalisation. Acceptance or tolerance needs supporting evidence from conversations, decisions and follow-up records. Missing comments are unknown, not evidence of acceptance.")
+        st.caption("DEMO: historical months reuse a constructed scenario. Apparent repetition in fictional records is for demonstration and must not be presented as an observed organisational trend.")
+        st.markdown("[Background: NASA — The Cost of Silence: Normalization of Deviance and Groupthink](https://sma.nasa.gov/docs/default-source/safety-messages/safetymessage-normalizationofdeviance-2014-11-03b.pdf?sfvrsn=c5421ef8_4)")
+
+
 def evidence_trail(groups, period, key_prefix="trail"):
     import streamlit as st
     import pandas as pd
@@ -71,6 +103,7 @@ def evidence_trail(groups, period, key_prefix="trail"):
     st.subheader('KPI → audit → finding → action')
     label = st.selectbox('Choose a KPI evidence set', list(groups), key=key_prefix+'-kpi')
     rows = groups[label]
+    normalisation_background(rows)
     st.caption('These are the contributing audit records. KPI 4 visit coverage and KPI 5 incident sources are reviewed in Detailed KPI Reports; audit counts do not replace those sources.')
     if not rows:
         st.info('No contributing audits in this selection.')
