@@ -1034,11 +1034,13 @@ def dashboard():
                     if demo_step==1:
                         st.session_state["findings-bar"]="BAR 1"
                 st.button("Open this step → "+step_view,key="open-presenter-step",on_click=open_walkthrough_step,type="primary")
-                st.caption("Close: Turn submitted audits into clear priorities, traceable evidence and a repeatable leadership report. Keep Improvement Scenario for questions at the end.")
+                st.caption("Close: Turn submitted audits into clear priorities, traceable evidence and a repeatable leadership report.")
             with st.container(border=True,key="dashboard-navigation"):
                 st.markdown("### Explore your assurance data")
                 st.caption("Overview & trends → audit detail → findings & evidence → leadership & improvement. Monthly views follow the selected filters; YTD views use completed months.")
-                selected_view=st.radio("Choose a data view",["Assurance Insights","Company & Site Performance","Monthly History","YTD Overview","YTD Audits","Detailed KPI Reports","Auditor View","Findings & Actions","Evidence Trail","Human Factors","KPI 5 Data","Leadership Report","Improvement Scenario"],horizontal=True,key="dashboard-data-view",label_visibility="collapsed")
+                if st.session_state.get("dashboard-data-view")=="Improvement Scenario":
+                    st.session_state["dashboard-data-view"]="Assurance Insights"
+                selected_view=st.radio("Choose a data view",["Assurance Insights","Company & Site Performance","Monthly History","YTD Overview","YTD Audits","Detailed KPI Reports","Auditor View","Findings & Actions","Evidence Trail","Human Factors","KPI 5 Data","Leadership Report"],horizontal=True,key="dashboard-data-view",label_visibility="collapsed")
             st.markdown(f'<div class="active-view"><strong>Viewing: {html.escape(selected_view)}</strong><span>{md.strftime("%B %Y")} · {html.escape(asset)} · {html.escape(site)}</span></div>',unsafe_allow_html=True)
             evidence_groups={
                 "KPI 1 · Site Controller":sc_samples,
@@ -1049,9 +1051,6 @@ def dashboard():
             if selected_view=="Evidence Trail":
                 from client_walkthrough import evidence_trail
                 evidence_trail(evidence_groups,period)
-            if selected_view=="Improvement Scenario":
-                from client_walkthrough import improvement_scenario
-                improvement_scenario(evidence_groups)
             if selected_view=="YTD Audits":
                 from ytd_views import render_cumulative
                 render_cumulative(all_a,y,m,asset,site)
