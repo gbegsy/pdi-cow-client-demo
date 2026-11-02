@@ -14,7 +14,7 @@ def day(value):
 
 
 def build(audits,year,month,groups,maps,coverage='Not assessed',today=None):
-    today=today or date.today();weeks=reporting_weeks(year,month);end=date(year,month,calendar.monthrange(year,month)[1]);start=weeks[0]
+    today=today or date.today();weeks=reporting_weeks(year,month);end=date(year,month,calendar.monthrange(year,month)[1]);start=date(year,month,1)
     source=[a for a in audits if not (a.get('metadata') or {}).get('uat_sample') and not (a.get('metadata') or {}).get('demo') and not a.get('audit_id','').startswith('DEMO-')]
     rows=[a for a in source if day(a.get('audit_date')) and start<=day(a['audit_date'])<=min(end,today)]
     permits=[a for a in rows if a['form_name']=='Control of Work: Permit Quality']
