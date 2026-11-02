@@ -106,7 +106,7 @@ def render_cumulative(audits,year,selected_month,asset,site):
         st.info(f"{latest['Cumulative unscored audits']} audits have no applicable Yes/No answers and are shown separately as unscored.")
     chart=pd.DataFrame(records)
     outcome_columns={'Cumulative conformant audits':'Conformant','Cumulative non-conformant audits':'Non-conformant','Cumulative unscored audits':'Unscored'}
-    plot=chart.melt(id_vars=['Through month'],value_vars=list(outcome_columns),var_name='Outcome',value_name='Cumulative audits')
+    plot=chart[['Through month']+list(outcome_columns)].melt(id_vars=['Through month'],value_vars=list(outcome_columns),var_name='Outcome',value_name='Cumulative audits')
     plot['Outcome']=plot['Outcome'].map(outcome_columns)
     st.vega_lite_chart(plot,{'mark':{'type':'bar'},'encoding':{'x':{'field':'Through month','type':'ordinal','sort':chart['Through month'].tolist(),'axis':{'labelAngle':-35}},'y':{'field':'Cumulative audits','type':'quantitative','stack':'zero'},'color':{'field':'Outcome','type':'nominal','scale':{'domain':['Conformant','Non-conformant','Unscored'],'range':['#16865b','#bd3d43','#8795a1']},'legend':{'orient':'top'}},'tooltip':[{'field':'Through month','type':'nominal'},{'field':'Outcome','type':'nominal'},{'field':'Cumulative audits','type':'quantitative'}]}},use_container_width=True)
     display=chart.copy()
