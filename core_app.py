@@ -736,6 +736,10 @@ def dashboard():
     global DB, DATABASE_URL, _SCHEMA_READY
     demo_mode=True
     all_a=[a for a in audits() if not a["audit_id"].startswith("DEMO-") and not a["metadata"].get("demo") and not a["metadata"].get("uat_sample")]
+    def show_ytd_period():
+        st.session_state["reporting-period"]="YTD Audits"
+        st.session_state["dashboard-data-view"]="YTD Audits"
+    st.button("YTD Audits",key="visible-ytd-period",on_click=show_ytd_period,type="primary",help="Open cumulative audits for all completed months this year.")
     with st.container(border=True,key="reporting-filters"):
         c1,c2,c3=st.columns([1,1,1.3])
         current_month=date.today().replace(day=1)
@@ -746,7 +750,7 @@ def dashboard():
             cursor=date(cursor.year-1,12,1) if cursor.month==1 else date(cursor.year,cursor.month-1,1)
         ordered_months=sorted(known_months,reverse=True)
         initial_month=date(2026,10,1) if demo_mode else current_month
-        reporting_choice=c1.selectbox("REPORTING MONTH",["YTD Audits"]+ordered_months,index=ordered_months.index(initial_month)+1,format_func=lambda d:d if isinstance(d,str) else d.strftime("%B %Y"))
+        reporting_choice=c1.selectbox("REPORTING MONTH",["YTD Audits"]+ordered_months,index=ordered_months.index(initial_month)+1,format_func=lambda d:d if isinstance(d,str) else d.strftime("%B %Y"),key="reporting-period")
         ytd_period_selected=reporting_choice=="YTD Audits"
         if ytd_period_selected:
             from datetime import timedelta
@@ -765,6 +769,10 @@ def dashboard():
         month=[a for a in month if a["site"] in asset_sites[asset]]
     site="All" if site=="All assets and teams" else site
     st.markdown(f'<div class="selection">{"YTD Audits · January–"+md.strftime("%B %Y") if ytd_period_selected else md.strftime("%B %Y")} &nbsp;·&nbsp; {html.escape("All assets and teams" if site=="All" else site)} &nbsp;·&nbsp; Monthly review</div>',unsafe_allow_html=True)
+    if ytd_period_selected:
+        from ytd_views import render_cumulative
+        render_cumulative(all_a,y,m,asset,site)
+        return
     selected_groups={g:v for g,v in SITE_GROUPS.items() if asset=="All" or g in asset_sites[asset]}
     headline_area=st.empty()
     headline_area.caption("Loading KPI evidence…")
