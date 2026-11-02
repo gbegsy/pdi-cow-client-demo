@@ -932,6 +932,25 @@ def dashboard():
                 st.markdown("**Measure and target**\nReport incidents confirmed as occurring during permit-controlled activities over a **rolling 12-month period**, with identification of HiPOs, losses of containment and significant injuries (MTC or above). Use reviewed Incident Register records and the Incident Register tracking spreadsheet.\n\n**Green:** No increase in the rolling 12-month incident trend. No HiPOs, significant injuries (MTC or above), or repeat loss-of-containment events identified. No intervention required; continue monitoring and discussion through Monthly Operations and QSHE meetings.\n\n**Amber:** Increasing incident trend, a single HiPO, significant injury, loss of containment, or a repeat event theme identified within the reporting period. Operations Director intervention through targeted campaigns, assurance activities or focused reviews to address identified themes.\n\n**Red:** Significant increase in incidents, multiple HiPOs, significant injuries (MTC or above), major loss-of-containment events, or evidence of recurring failures in permit controls. Immediate General Manager intervention; investigation findings, learning actions and improvement measures implemented and tracked to closure.")
         @st.fragment
         def render_dashboard_views():
+            with st.expander("Five-minute client walkthrough · presenter guide",expanded=False):
+                st.caption("Opening: All records are fictional. Imagine these are your monthly Control of Work audits.")
+                demo_steps=[
+                    ("1 · Overall position · 45 seconds","Assurance Insights","This shows whether planned assurance happened and what the completed audits found. Distinguish audit delivery from audit conformance."),
+                    ("2 · Critical findings · 60 seconds","Findings & Actions","Behind each BAR 1 number are the failed questions, recorded evidence, immediate safety actions and accountable owners. The overview also has a Reveal BAR 1 control."),
+                    ("3 · Follow the evidence · 60 seconds","Evidence Trail","Trace one KPI to its contributing audits, then open an audit to see findings, actions and related comments. No spreadsheet search is needed."),
+                    ("4 · Working conditions · 60 seconds","Human Factors","Use the narrative and a source comment to explore procedures, handovers and workplace conditions. These are review prompts, not proven causes."),
+                    ("5 · Leadership output · 60 seconds","Leadership Report","Submitted audits populate the monthly briefing, priorities and supporting detail, ready for management review.")
+                ]
+                demo_step=st.selectbox("Presentation step",range(len(demo_steps)),format_func=lambda i:demo_steps[i][0],key="presenter-step")
+                step_label,step_view,step_prompt=demo_steps[demo_step]
+                st.markdown("**Presenter prompt**")
+                st.write(step_prompt)
+                def open_walkthrough_step():
+                    st.session_state["dashboard-data-view"]=step_view
+                    if demo_step==1:
+                        st.session_state["findings-bar"]="BAR 1"
+                st.button("Open this step → "+step_view,key="open-presenter-step",on_click=open_walkthrough_step,type="primary")
+                st.caption("Close: Turn submitted audits into clear priorities, traceable evidence and a repeatable leadership report. Keep Improvement Scenario for questions at the end.")
             with st.container(border=True,key="dashboard-navigation"):
                 st.markdown("### Explore the assurance data")
                 st.caption("Start with insights → open a detailed KPI → review findings and owners → present the leadership report. All views use the month, asset and site selected above.")
