@@ -1040,7 +1040,7 @@ def dashboard():
                 st.caption("Overview & trends → audit detail → findings & evidence → leadership & improvement. Monthly views follow the selected filters; YTD views use completed months.")
                 if st.session_state.get("dashboard-data-view")=="Improvement Scenario":
                     st.session_state["dashboard-data-view"]="Assurance Insights"
-                selected_view=st.radio("Choose a data view",["Assurance Insights","Company & Site Performance","Monthly History","YTD Overview","YTD Audits","Detailed KPI Reports","Auditor View","Findings & Actions","Evidence Trail","Human Factors","KPI 5 Data","Leadership Report"],horizontal=True,key="dashboard-data-view",label_visibility="collapsed")
+                selected_view=st.radio("Choose a data view",["Assurance Insights","Mine the Diamond","Company & Site Performance","Monthly History","YTD Overview","YTD Audits","Detailed KPI Reports","Auditor View","Findings & Actions","Evidence Trail","Human Factors","KPI 5 Data","Leadership Report"],horizontal=True,key="dashboard-data-view",label_visibility="collapsed")
             st.markdown(f'<div class="active-view"><strong>Viewing: {html.escape(selected_view)}</strong><span>{md.strftime("%B %Y")} · {html.escape(asset)} · {html.escape(site)}</span></div>',unsafe_allow_html=True)
             evidence_groups={
                 "KPI 1 · Site Controller":sc_samples,
@@ -1188,6 +1188,9 @@ def dashboard():
                     st.dataframe(repeat_df,use_container_width=True,hide_index=True)
                 else:
                     st.success("No negative assurance responses in this view.")
+            if selected_view=="Mine the Diamond":
+                from diamond_insights import render as render_diamond
+                render_diamond(permit+tbt+lead,period)
             if selected_view=="Assurance Insights":
                 st.markdown("**CoW Assurance Insights.** See what all three audit types found, which work-control checks need attention and what to do next.")
                 insight_audits=permit+tbt+lead
