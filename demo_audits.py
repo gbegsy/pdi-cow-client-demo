@@ -3,7 +3,7 @@ import json
 from datetime import date, timedelta
 
 PERIOD = '2026-09'
-SCENARIO = 'september-conformance-75-83-hf-v3'
+SCENARIO = 'full-months-2026-jan-oct-v4'
 
 
 def prepare(db, questions, groups):
@@ -11,7 +11,9 @@ def prepare(db, questions, groups):
     schema(db)
     c=db()
     if c.execute("SELECT COUNT(*) FROM audits WHERE audit_id LIKE 'MOCK-%'").fetchone()[0]:
-        c.close(); return
+        c.close()
+        prepare_full_months(db)
+        return
     weeks=[date(2026,8,31)+timedelta(days=7*i) for i in range(5)]
     serial=0
 
@@ -88,4 +90,55 @@ def prepare(db, questions, groups):
         c.execute('INSERT INTO cow_incidents VALUES(?,?,?,?,?,?,?,?,?,?,?,?)',(f'MOCK-INC-{i+1}',str(day),'North Remote Sites','Generated permitted-activity incident for demonstration only','Demo mechanical task','Unconfirmed',0,'MTC' if i==0 else 'None',int(i==1),0,0,f'MOCK-Incident Register-{i+1}'))
     c.execute('INSERT INTO kpi_recovery_actions VALUES(?,?,?,?,?,?,?,?,?,?,?)',('MOCK-ACTION',PERIOD,'All / All','KPI 1','Demo Action Owner','','Review missed weekly sampling and agree the next assurance priorities.','2026-10-15','Open','',json.dumps([dict(source_reference='MOCK weekly sampling shortfalls',at='2026-09-30')])) )
     c.commit();c.close()
+    prepare_full_months(db)
 
+
+def prepare_full_months(db):
+    """Add fictional full calendar months once, preserving existing submissions."""
+    import calendar
+    from kpi_rules import reporting_weeks
+    c=db()
+    source=c.execute("SELECT * FROM audits WHERE audit_id LIKE 'MOCK-%' AND audit_date LIKE '2026-09-%' ORDER BY audit_date,audit_id").fetchall()
+    if not source:
+        c.close()
+        return
+    for month in list(range(1,9))+[10]:
+        period=f"2026-{month:02d}"
+        prefix=f"MOCK-{period}-"
+        if c.execute("SELECT COUNT(*) FROM audits WHERE audit_id LIKE ?",(prefix+"%",)).fetchone()[0]:
+            continue
+        month_end=date(2026,month,calendar.monthrange(2026,month)[1])
+        month_start=date(2026,month,1)
+        target_weeks=reporting_weeks(2026,month)
+        def mapped(value):
+            old=date.fromisoformat(str(value)[:10])
+            week_index=min(4,max(0,(old.day-1)//7))
+            week=target_weeks[min(week_index,len(target_weeks)-1)]
+            return max(month_start,min(month_end,week+timedelta(days=1)))
+        for row in source:
+            values=list(row)
+            aid=prefix+row[0]
+            audit_day=mapped(row[3])
+            meta=json.loads(row[7] or '{}')
+            responses=json.loads(row[8] or '[]')
+            meta.update(audit_date=str(audit_day),reference=aid,demo_scenario=SCENARIO,fictional_full_month=True)
+            for response in responses:
+                if response.get('response')=='No':
+                    response['action_due_date']=str(month_end+timedelta(days=15))
+            values[0]=aid;values[1]=str(audit_day)+'T12:00:00';values[3]=str(audit_day);values[6]=aid
+            values[7]=json.dumps(meta);values[8]=json.dumps(responses)
+            c.execute("INSERT INTO audits VALUES(?,?,?,?,?,?,?,?,?,?)",tuple(values))
+        original_visits=c.execute("SELECT * FROM kpi4_visits WHERE visit_id LIKE 'MOCK-%' AND visit_date LIKE '2026-09-%'").fetchall()
+        for row in original_visits:
+            visit=list(row);visit[0]=prefix+row[0];visit[1]=str(mapped(row[1]));visit[5]=prefix+row[5];visit[6]=str(month_end)
+            c.execute("INSERT INTO kpi4_visits VALUES(?,?,?,?,?,?,?)",tuple(visit))
+        original_rota=c.execute("SELECT * FROM leadership_obligations WHERE period='2026-09' AND obligation_id LIKE 'MOCK-%'").fetchall()
+        for row in original_rota:
+            rota=list(row);rota[0]=prefix+row[0];rota[1]=period
+            rota[4]=str(mapped(row[4])-timedelta(days=mapped(row[4]).weekday()))
+            rota[7]=prefix+row[7]
+            c.execute("INSERT INTO leadership_obligations VALUES(?,?,?,?,?,?,?,?,?)",tuple(rota))
+        c.execute("INSERT INTO governance VALUES(?,?,?,?,?,?,?,?,?,?,?,?)",(period,'All','Aligned and nine-group rotation confirmed',100,0,0,'Reasonable','Suitable','Reasonable','Isolated minor',0,0))
+        c.execute("INSERT INTO kpi5 VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)",(prefix+'KPI5',str(month_end)+'T12:00:00',period,'All',12,10,0,1,1,0,'No','No','No','FICTIONAL DEMO: full-month incident summary; rolling 12-month values are snapshots and must not be summed across months. Twelve versus ten incidents, one MTC and one LOC. No live Incident Register source.',0))
+        c.execute("INSERT INTO kpi_recovery_actions VALUES(?,?,?,?,?,?,?,?,?,?,?)",(prefix+'ACTION',period,'All / All','KPI 1','Demo Action Owner','','Review missed sampling, agree accountable actions and verify improvements.',str(month_end+timedelta(days=15)),'Open','',json.dumps([dict(source_reference=prefix+'sampling',at=str(month_end))])))
+    c.commit();c.close()
