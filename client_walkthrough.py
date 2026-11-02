@@ -50,23 +50,7 @@ def snapshot(rows, statuses):
                 st.write(finding.get('smart_action') or 'Not recorded')
                 st.caption(f"Owner: {finding.get('action_owner') or 'Unassigned'} · Due: {finding.get('action_due_date') or 'Not recorded'}")
         st.caption("A recorded action does not demonstrate that the control has been restored; check the verification evidence.")
-    st.markdown("""
-<style>
-.bar-definition-help{position:relative;display:inline-block;margin:8px 0 12px;color:#15394f;font-size:14px;font-weight:650;cursor:help}
-.bar-definition-help .bar-definition-tip{display:none;position:absolute;z-index:1000;left:0;top:100%;width:min(650px,80vw);padding:16px 18px;background:#15394f;color:white;border-radius:9px;box-shadow:0 6px 24px #102f4b35;font-size:13px;font-weight:400;line-height:1.55}
-.bar-definition-help:hover .bar-definition-tip,.bar-definition-help:focus .bar-definition-tip,.bar-definition-help:focus-within .bar-definition-tip{display:block}
-.bar-definition-tip p{margin:0 0 10px;color:white}.bar-definition-tip p:last-child{margin:0}
-.bar-definition-help:focus-visible{outline:3px solid #1684c1;outline-offset:4px}
-</style>
-<span class="bar-definition-help" tabindex="0" aria-describedby="bar-definition-tooltip">BAR definitions ⓘ
-<span class="bar-definition-tip" id="bar-definition-tooltip" role="tooltip">
-<p><strong>BAR — Barrier Assurance Review</strong></p>
-<p><strong>BAR 1 · Critical control verification:</strong> checks required controls against major accident or serious harm. A No requires immediate action to make work safe.</p>
-<p><strong>BAR 2 · Operational control:</strong> checks planning, understanding, supervision and how work is carried out. A No requires correction and tracking.</p>
-<p><strong>BAR 3 · Management and learning:</strong> checks oversight, records, lessons and improvement follow-up. A No requires an improvement action.</p>
-<p>The BAR is assigned to the audit question, not separately scored against the finding. Demonstration classifications require client agreement.</p>
-</span></span>
-""",unsafe_allow_html=True)
+    st.markdown("**BAR definitions**",help="BAR — Barrier Assurance Review\n\nBAR 1 · Critical control verification: checks required controls against major accident or serious harm. A No requires immediate action to make work safe.\n\nBAR 2 · Operational control: checks planning, understanding, supervision and how work is carried out. A No requires correction and tracking.\n\nBAR 3 · Management and learning: checks oversight, records, lessons and improvement follow-up. A No requires an improvement action.\n\nThe BAR is assigned to the audit question, not separately scored against the finding. Demonstration classifications require client agreement.")
     st.write(f"**Performance:** Red: {red or 'None'} · Amber: {amber or 'None'}.")
     if failed:
         repeated = Counter(r.get('question', '') for _, r in failed)
