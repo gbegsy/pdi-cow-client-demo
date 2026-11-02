@@ -50,6 +50,15 @@ def render(audits, year, selected_month, asset, site):
     st.caption('Conformance describes the audit sample. Monthly KPI delivery and quarterly engagement/visit requirements retain their own criteria in Detailed KPI Reports. Rolling 12-month incident snapshots are not added together as a YTD incident total.')
 
 
+def audit_outcomes(audits):
+    """Classify each audit once; no applicable answers is unscored."""
+    counts={'Conformant':0,'Non-conformant':0,'Unscored':0}
+    for audit in audits:
+        answers=[r.get('response') for r in audit.get('responses',[]) if r.get('response') in {'Yes','No'}]
+        counts['Non-conformant' if 'No' in answers else 'Conformant' if answers else 'Unscored']+=1
+    return counts
+
+
 def cumulative_rows(audits,year,selected_month,site='All',today=None):
     from kpi_rules import audit_conformance, checklist_conformance
     cutoff,source,months=full_months(audits,year,selected_month,site,today)
@@ -58,10 +67,14 @@ def cumulative_rows(audits,year,selected_month,site='All',today=None):
     for month,rows in months:
         running.extend(rows)
         answers=[r for a in running for r in a.get('responses',[]) if r.get('response') in {'Yes','No'}]
+        outcomes=audit_outcomes(running)
         output.append({
             'Through month':f'{calendar.month_name[month]} {year}',
             'Audits this month':len(rows),
             'Cumulative audits':len(running),
+            'Cumulative conformant audits':outcomes['Conformant'],
+            'Cumulative non-conformant audits':outcomes['Non-conformant'],
+            'Cumulative unscored audits':outcomes['Unscored'],
             'Cumulative permit audits':sum(a.get('form_name')=='Control of Work: Permit Quality' for a in running),
             'Cumulative TBT / Permit / POP':sum('Toolbox Talk' in a.get('form_name','') for a in running),
             'Cumulative leadership engagements':sum('Leadership Engagement' in a.get('form_name','') for a in running),
@@ -86,10 +99,16 @@ def render_cumulative(audits,year,selected_month,asset,site):
     latest=records[-1]
     a,b,c=st.columns(3)
     a.metric('Cumulative audits',latest['Cumulative audits'])
-    b.metric('Completed months',len(records))
-    c.metric('Latest full month',calendar.month_name[cutoff])
+    b.metric('Conformant audits',latest['Cumulative conformant audits'])
+    c.metric('Non-conformant audits',latest['Cumulative non-conformant audits'])
+    st.caption(f"{len(records)} completed months · Latest full month: {calendar.month_name[cutoff]}. Conformant = at least one applicable answer and no No answers. Non-conformant = at least one No. N/A answers are excluded.")
+    if latest['Cumulative unscored audits']:
+        st.info(f"{latest['Cumulative unscored audits']} audits have no applicable Yes/No answers and are shown separately as unscored.")
     chart=pd.DataFrame(records)
-    st.vega_lite_chart(chart,{'mark':{'type':'line','point':True,'color':'#147c87','strokeWidth':3},'encoding':{'x':{'field':'Through month','type':'ordinal','sort':chart['Through month'].tolist(),'axis':{'labelAngle':-35}},'y':{'field':'Cumulative audits','type':'quantitative'},'tooltip':[{'field':'Through month','type':'nominal'},{'field':'Audits this month','type':'quantitative'},{'field':'Cumulative audits','type':'quantitative'}]}},use_container_width=True)
+    outcome_columns={'Cumulative conformant audits':'Conformant','Cumulative non-conformant audits':'Non-conformant','Cumulative unscored audits':'Unscored'}
+    plot=chart.melt(id_vars=['Through month'],value_vars=list(outcome_columns),var_name='Outcome',value_name='Cumulative audits')
+    plot['Outcome']=plot['Outcome'].map(outcome_columns)
+    st.vega_lite_chart(plot,{'mark':{'type':'bar'},'encoding':{'x':{'field':'Through month','type':'ordinal','sort':chart['Through month'].tolist(),'axis':{'labelAngle':-35}},'y':{'field':'Cumulative audits','type':'quantitative','stack':'zero'},'color':{'field':'Outcome','type':'nominal','scale':{'domain':['Conformant','Non-conformant','Unscored'],'range':['#16865b','#bd3d43','#8795a1']},'legend':{'orient':'top'}},'tooltip':[{'field':'Through month','type':'nominal'},{'field':'Outcome','type':'nominal'},{'field':'Cumulative audits','type':'quantitative'}]}},use_container_width=True)
     display=chart.copy()
     for column in ['Cumulative question conformance','Cumulative whole-audit conformance']:
         display[column]=display[column].map(format_percentage)
