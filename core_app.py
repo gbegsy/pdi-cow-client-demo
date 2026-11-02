@@ -242,6 +242,68 @@ button:focus-visible,input:focus-visible,textarea:focus-visible,[role="combobox"
 .st-key-dashboard-navigation [role="radiogroup"] label:has(input:checked) p{color:#fff!important;font-weight:750}
 .st-key-dashboard-navigation [role="radiogroup"] label:focus-within{outline:3px solid #1886ba;outline-offset:3px}
 
+
+/* PDi executive design system: calm surfaces, clear hierarchy, consistent controls. */
+:root{--pdi-ink:#102d42;--pdi-muted:#607585;--pdi-line:#d6e1e8;--pdi-teal:#147c87;--pdi-bg:#f3f6fa}
+[data-testid="stAppViewContainer"]{background:var(--pdi-bg)}
+.block-container,[data-testid="stMainBlockContainer"]{max-width:1560px;padding-top:1.4rem}
+[data-testid="stSidebar"]{background:#edf2f6;border-right:1px solid #d4dfe7}
+[data-testid="stSidebar"] h3{font-size:24px;letter-spacing:-.6px}
+[data-testid="stSidebar"] [role="radiogroup"]{gap:5px}
+[data-testid="stSidebar"] [role="radiogroup"] label{border:1px solid transparent!important;background:transparent!important;border-radius:9px;padding:10px 12px}
+[data-testid="stSidebar"] [role="radiogroup"] label:has(input:checked){background:#fff!important;border-color:#c1d4df!important;box-shadow:0 3px 10px #16364b0c}
+[data-testid="stSidebar"] [data-testid="stExpander"]{background:transparent}
+.dash{position:relative;overflow:hidden;background:linear-gradient(112deg,#102d42 0%,#163e56 70%,#1a5964 100%);border:1px solid #284e62;border-radius:16px;padding:23px 28px 25px;box-shadow:0 8px 24px #102d4214;margin-bottom:18px}
+.dash .brand-row{gap:18px}
+.dash .eyebrow{font-size:10px;letter-spacing:1.6px;color:#b5dce6}
+.dash h1{font-size:31px;letter-spacing:-.8px;line-height:1.15;margin:18px 0 8px;font-weight:750}
+.dash p{font-size:15px;color:#d7e8ef}
+.demo-chip{display:inline-block;margin-top:16px;border:1px solid #7da4b56b;border-radius:30px;padding:5px 9px;color:#deedf4;font-size:9px;letter-spacing:1px;font-weight:750}
+.st-key-reporting-filters{background:white;border:1px solid var(--pdi-line)!important;border-radius:12px!important;padding:14px 18px!important;box-shadow:0 2px 9px #102d4205}
+.st-key-reporting-filters label p{font-size:11px;font-weight:750;letter-spacing:.7px;color:#486273}
+.selection{border:0;border-left:3px solid var(--pdi-teal);background:#e8f2f4;border-radius:8px;padding:9px 13px;color:#214b59;font-size:12px;margin:12px 0 18px}
+.summary{gap:12px;grid-template-columns:minmax(190px,1.35fr) repeat(4,minmax(0,1fr));margin-bottom:5px}
+.summary-main,.summary-stat{border-radius:12px;padding:17px 18px;box-shadow:0 3px 12px #102d4206;min-height:138px}
+.summary-main{background:#102d42;border-color:#102d42}
+.summary-label{font-size:10px;letter-spacing:.8px;line-height:1.5}
+.summary-value{font-size:32px;letter-spacing:-1px;margin:12px 0 8px}
+.summary-sub{font-size:11px;line-height:1.5}
+.review-heading{margin:19px 0 10px}
+.review-heading .eyebrow{color:var(--pdi-teal);font-size:10px;letter-spacing:1.4px;font-weight:800}
+.review-heading h3{font-size:22px;letter-spacing:-.4px;margin:5px 0 0;padding:0;color:var(--pdi-ink)}
+.section-head{font-size:22px;letter-spacing:-.4px;margin:22px 0 12px}
+.kpi{border-radius:12px;box-shadow:0 3px 12px #102d4209;transition:box-shadow .18s}
+.kpi:hover{box-shadow:0 8px 20px #102d421c}
+.kpi .kt{font-size:10px;letter-spacing:1px;color:#6c8190}
+.kpi .ks{font-weight:750;color:#102d42;line-height:1.4}
+.kpi .metric-line{border-top:1px solid #e1e9ef}
+.kpi .metric-line span{color:#5f7687;font-weight:750;letter-spacing:.65px}
+.kpi .metric-line strong{font-weight:750;letter-spacing:-.3px}
+.kpi .kd{color:#647987}
+.badge{padding:5px 9px;font-size:10px;letter-spacing:.5px}
+[data-testid="stMetric"]{border-radius:12px;border:1px solid var(--pdi-line);box-shadow:0 2px 8px #102d4205}
+[data-testid="stMetricLabel"] p{color:#5c7485;font-size:12px}
+[data-testid="stMetricValue"]{font-size:30px;font-weight:750;letter-spacing:-.7px}
+[data-testid="stExpander"]{border:1px solid var(--pdi-line);border-radius:10px;box-shadow:none}
+[data-testid="stExpander"] summary{padding-top:10px;padding-bottom:10px}
+[data-testid="stButton"] button,[data-testid="stDownloadButton"] button,[data-testid="stPopover"] button{font-weight:650;min-height:42px;border-radius:9px}
+[data-testid="stButton"] button[kind="primary"]{background:#147c87;border-color:#147c87}
+.st-key-dashboard-navigation{background:linear-gradient(120deg,#e8f0f5,#f5f8fb)!important;border:1px solid #a7bfce!important;border-top:5px solid #147c87!important;border-radius:14px!important;padding:19px!important;margin-top:18px;box-shadow:0 5px 18px #102d420a}
+.st-key-dashboard-navigation h3{font-size:22px;letter-spacing:-.4px}
+.st-key-dashboard-navigation [role="radiogroup"]{gap:8px!important}
+.st-key-dashboard-navigation [role="radiogroup"] label{border:1px solid #adc3d2!important;box-shadow:0 2px 4px #102d4207!important;border-radius:9px!important;padding:11px 13px!important;min-height:48px!important;transition:background .15s,box-shadow .15s}
+.st-key-dashboard-navigation [role="radiogroup"] label p{font-size:13px;font-weight:650;line-height:1.35}
+.st-key-dashboard-navigation [role="radiogroup"] label:hover{background:#e0edf3!important;border-color:#4f8a9f!important}
+.st-key-dashboard-navigation [role="radiogroup"] label:has(input:checked){background:#102d42!important;border-color:#102d42!important;box-shadow:0 3px 9px #102d4226!important}
+.active-view{background:#fff;color:#102d42;border:1px solid var(--pdi-line);border-left:5px solid var(--pdi-teal);border-radius:10px;padding:13px 16px;margin:18px 0 14px}
+.active-view strong{font-size:15px}.active-view span{font-size:12px;color:#607585}
+h2,h3,h4{color:#102d42;letter-spacing:-.35px}
+[data-testid="stDataFrame"]{border-radius:10px;overflow:hidden;border:1px solid #dbe5ed}
+[data-testid="stAlert"]{border-radius:10px}
+@media(min-width:1100px){.kpi{height:470px!important;min-height:470px;grid-template-rows:14px 54px 190px 24px 40px minmax(58px,1fr)}}
+@media(max-width:1120px){.summary{grid-template-columns:repeat(2,minmax(0,1fr))}.summary-main{grid-column:span 2}}
+@media(max-width:650px){.dash{padding:20px}.dash h1{font-size:26px}.summary{grid-template-columns:1fr}.summary-main{grid-column:auto}.summary-main,.summary-stat{min-height:0}.st-key-dashboard-navigation{padding:13px!important}.active-view{gap:6px}}
+
 </style>
 """, unsafe_allow_html=True)
 
@@ -664,12 +726,12 @@ def recovery_actions(period, scope, kpi_filter=None):
 
 
 def dashboard():
-    st.markdown(f'<div class="dash"><div class="brand-row"><strong style="font-size:25px">PDi | VERIFY</strong><div class="eyebrow">PDi DEMO | OPERATIONAL ASSURANCE</div></div><h1>Control of Work KPI Dashboard</h1><p>Client demonstration · fictional assurance data</p></div>',unsafe_allow_html=True)
-    st.caption("Demo route: KPI overview → Evidence Trail → Human Factors → Leadership Report. Use Improvement Scenario to explore potential gains.")
+    st.markdown(f'<div class="dash"><div class="brand-row"><strong style="font-size:25px">PDi | VERIFY</strong><div class="eyebrow">PDi DEMO | OPERATIONAL ASSURANCE</div></div><h1>Control of Work Assurance</h1><p>From audit evidence to clear leadership decisions.</p><span class="demo-chip">CLIENT DEMONSTRATION · FICTIONAL DATA</span></div>',unsafe_allow_html=True)
+
     global DB, DATABASE_URL, _SCHEMA_READY
     demo_mode=True
     all_a=[a for a in audits() if not a["audit_id"].startswith("DEMO-") and not a["metadata"].get("demo") and not a["metadata"].get("uat_sample")]
-    with st.container(border=True):
+    with st.container(border=True,key="reporting-filters"):
         c1,c2,c3=st.columns([1,1,1.3])
         current_month=date.today().replace(day=1)
         known_months={safe_date(a["audit_date"]).replace(day=1) for a in all_a if safe_date(a["audit_date"])}|{current_month}
@@ -868,7 +930,7 @@ def dashboard():
         if quality_issues:
             with st.expander(f"Data quality checks · {quality_issues} items to review"):
                 st.write(f"{unclassified} permit audits need a verified routine/non-routine category; {missing_core} records lack a site or auditor; {max(0,len(action_findings)-action_recorded)} No responses have no recorded SMART action. Review the records and evidence in Findings & Actions.")
-        from client_walkthrough import snapshot, evidence_popup
+        from client_walkthrough import snapshot
         snapshot(permit+tbt+lead,statuses)
         st.markdown('<div class="section-head">CoW KPI Results</div>',unsafe_allow_html=True)
         cols=st.columns(5)
@@ -885,16 +947,12 @@ def dashboard():
             k1_red=[label for flag,label in ((k1p is not None and k1p<70,"Sample delivery below 70%"),(k1c is not None and k1c<70,"Whole-permit conformance below 70%")) if flag]
             k1_reason=("; ".join(k1_red) or "Red criterion triggered") if k1s=="Red" else ("Monthly and weekly targets met" if k1s=="Green" else "Weekly site/category coverage needs review" if k1s=="Needs review" else "Delivery or conformance below Green threshold" if k1s=="Amber" else "Eligible samples needed")
             measure_card("KPI 1","Site Controller – Permit Quality","Weekly/category credits / plan",f"{k1done}/{k1plan or '—'} ({format_percentage(k1p)})" if k1p is not None else f"{k1done}/{k1plan or '—'}","Whole-permit conformance (SC)",format_percentage(k1c) if k1c is not None else "—",k1s,k1_reason,f"{k1_passed}/{len(k1_scored)} scored permits fully conformant · {len(sc_samples)} Site Controller samples recorded; {k1done} credited · {k1weekly}/{k1weekly_plan} weekly site/category targets met")
-            with st.popover("Open KPI 1 evidence",use_container_width=True):
-                evidence_popup({"KPI 1 · Site Controller":sc_samples},period,key_prefix="kpi-1-popup")
             with st.expander("KPI Targets & Tolerances"):
                 st.markdown("**Measure and target**\nSite Controllers sample permits before issue. Routine and non-routine samples are reported separately. A permit that fails any checklist item is non-conformant for reporting.\n\n| Site | Routine per week | Non-routine per week |\n|---|---:|---:|\n| Site Alpha | 1 | 1 |\n| Site Bravo | 1 | 1 |\n| Site Charlie | 1 | 1 |\n| North Remote Sites | 2 | 1 |\n| Site Delta | 1 | 1 |\n| Site Echo | 1 | 1 |\n| South Remote Sites | 2 | 1 |\n\n**Green:** 100% or greater of planned audits completed **AND** 90% or greater audit conformance. No intervention required.\n\n**Amber:** 70% to below 100% of planned audits completed **AND/OR** 70–89% audit conformance. Site Leadership intervention to identify improvement opportunities and address emerging trends.\n\n**Red:** Less than 70% of planned audits completed **AND/OR** less than 70% audit conformance. Immediate management intervention, with improvement actions implemented within one month.")
         with cols[1]:
             k2_red=[label for flag,label in ((k2p is not None and k2p<70,"Sample delivery below 70%"),(k2c is not None and k2c<70,"Whole-permit conformance below 70%")) if flag]
             k2_reason=("; ".join(k2_red) or "Red criterion triggered") if k2s=="Red" else (("UAT thresholds met; source validation pending" if gov["kpi2_alignment"]=="Synthetic UAT alignment (unverified)" else "Delivery, conformance and source checks met") if k2s=="Green" else "Weekly rotation or comparison needs validation" if k2s=="Needs review" else f"Whole-permit conformance {format_percentage(k2c)}" if k2s=="Amber" and k2c is not None and k2c<90 else "Delivery below Green threshold" if k2s=="Amber" else "Eligible samples needed")
             measure_card("KPI 2","Asset Superintendent – Permit Quality","Reporting weeks met / plan",f"{k2done}/{k2plan or '—'} ({format_percentage(k2p)})" if k2p is not None else f"{k2done}/{k2plan or '—'}","Whole-permit conformance (AS)",format_percentage(k2c) if k2c is not None else "—",k2s,k2_reason,f"{len(as_samples)} AS audits; {k2done} credited weeks · {k2weekly}/{k2weekly_plan} weeks · {k2cov}/9 rotation groups seen")
-            with st.popover("Open KPI 2 evidence",use_container_width=True):
-                evidence_popup({"KPI 2 · Asset Superintendent":as_samples},period,key_prefix="kpi-2-popup")
             with st.expander("KPI Targets & Tolerances"):
                 st.markdown("**Measure and target**\nAsset Superintendents complete a minimum of **one permit-quality audit per week**, rotating across Site Charlie, Site Bravo, North Mobile Team, North Support Team, Site Alpha, Site Echo, South Mobile Team, South Support Team and Site Delta. Routine and non-routine samples are reported separately. A permit that fails any checklist item is non-conformant.\n\nReview site self-verification against independent assurance findings to identify differences in the detection of non-conformances and improvement opportunities. Findings are shared with the Site Controller during the regular assurance review, attended by the QSHE Manager and Operations Director.\n\n**Green:** 100% or greater of planned audits completed **AND** 90% or greater audit conformance. No intervention required.\n\n**Amber:** 70% to below 100% of planned audits completed **AND/OR** 70–89% audit conformance. Operations Director intervention to identify improvement opportunities and address emerging trends.\n\n**Red:** Less than 70% of planned audits completed **AND/OR** less than 70% audit conformance. Immediate Operations Director intervention, with improvement actions implemented within one month.")
         with cols[2]:
@@ -908,8 +966,6 @@ def dashboard():
             k3_amber=[label for flag,label in ((k3n==2,"Two engagements"),(k3c is not None and 70<=k3c<90,"Engagement conformance below 90%"),(gov["kpi3_coverage"]=="Imbalanced","Remote Site team coverage imbalanced")) if flag]
             k3_reason=("; ".join(k3_amber) or "Quarter criteria partly met") if k3s=="Amber" else ("Engagement conformance below 70% or quarterly delivery below target" if k3s=="Red" else "Engagement, checklist and coverage criteria met" if k3s=="Green" else "Quarter coverage or source check needs review" if k3s=="Needs review" else "Company-wide quarter rating only" if site!="All" else "Quarter still in progress")
             measure_card("KPI 3","Leadership CoW Engagements – Remote Site","Quarter-to-date engagements / quarterly target",f"{k3n}/3 ({round(100*k3n/3)}%)" if site=="All" else str(k3n),"Engagement conformance (%)",format_percentage(k3c) if k3c is not None else "—",k3s,k3_reason,f"{len(k3month)} this month · {k3passed} meet / {k3failed} do not meet · Remote Site coverage {gov['kpi3_coverage']}")
-            with st.popover("Open KPI 3 evidence",use_container_width=True):
-                evidence_popup({"KPI 3 · Leadership (quarter to date)":qlead},period,key_prefix="kpi-3-popup")
             with st.expander("KPI Targets & Tolerances"):
                 st.markdown("**Measure and target**\nA minimum of **three Remote Site team engagements per quarter, collectively** across the Operations Director, Deputy Operations Director, the asset assurance and operations support roles. Record the engagement count and Control of Work Leadership Engagement Checklist compliance result. Visit evidence is sourced from Visit Register.\n\nCoverage includes the fictional mobile and remote-site teams. Record an Intervention Team engagement as a single entry; include Head Office-based personnel under Office Engagements; record individual team engagements on multi-team Support visits. Quayside engagements can be included. These engagements may count towards existing Management Site Visit expectations.\n\n**Green:** Three or more visits per quarter collectively **AND** 90–100% checklist compliance, with reasonable coverage across Remote Site teams. No intervention required.\n\n**Amber:** Two visits per quarter collectively **AND/OR** 70–89% checklist compliance, isolated non-conformances, or recurring minor themes requiring attention. Site visitation demonstrates over or under coverage across Remote Site locations. Operations Director review of leadership visibility, asset coverage and engagement, and/or improvement opportunities and emerging trends.\n\n**Red:** One or fewer visits per quarter collectively **AND/OR** less than 70% checklist compliance. Immediate General Manager intervention to agree and implement a recovery plan within one month.")
         with cols[3]:
@@ -923,26 +979,12 @@ def dashboard():
             if any(k4_reasons):k4_detail+="<br>Not counted: "+" · ".join(reason for reason in k4_reasons if reason)
             k4_reason="Visit, conformance or qualitative Red criterion triggered" if k4s=="Red" else "100% role coverage and at least 90% conformance" if k4s=="Green" else "Role coverage or conformance below Green threshold" if k4s=="Amber" else "Eligible Remote Site monitoring evidence needed"
             measure_card("KPI 4","Site Leadership – Permit compliance Remote Site","Verified Remote Site visit coverage",f"Supervisor {verified_oo}/{verified_plan} weeks · HSE Adviser {verified_med}/{verified_plan} weeks · Site Manager {verified_oim}/1 quarter","Level 4 audit conformance (%)",format_percentage(k4raw),k4s,k4_reason,f"{k4passed}/{len(k4scored)} scored audits conformant · verify actual visits in KPI 4 detail")
-            with st.popover("Open KPI 4 evidence",use_container_width=True):
-                evidence_popup({"KPI 4 · Remote Site audit conformance":[a for a in tbt if a["site"] in {"North Remote Sites","South Remote Sites"} and tbt_auditor_role(a,tmap) in {"Operations Supervisor","HSE Adviser","Site Manager"}]},period,key_prefix="kpi-4-popup")
             with st.expander("KPI Targets & Tolerances"):
                 st.markdown("**Measure and target**\nRecord Remote Site visits by month and role, and Level 4 TBT/Compliance Monitoring outputs. Use Permit Register permit samples and Visit Register visit records; report routine and non-routine samples separately.\n\n- **Operations Supervisor:** minimum one visit per week.\n- **HSE Adviser:** minimum one visit per week.\n- **Site Manager:** minimum one visit per quarter.\n- **Target:** 100% or greater of planned audits completed **AND** 90% or greater audit conformance.\n\n**Green**\n- Supervisor and HSE Adviser: 100% or more expected Remote Site visits achieved each week during the month.\n- Site Manager: quarterly visit target achieved, with reasonable coverage across Remote Sites.\n- **AND** Level 4 monitoring demonstrates at least 90% compliance, with no repeat or significant non-conformances.\n- No intervention required.\n\n**Amber**\n- Supervisor: 50–99% of expected Remote Site visits during the month.\n- HSE Adviser: 50–99% of expected Remote Site visits during the month.\n- Site Manager: visit outside the planned quarter, or limited asset coverage.\n- **AND/OR** Level 4 compliance of 70–89%, isolated non-conformances, or recurring minor themes requiring attention.\n- Review justification, findings and corrective actions, and opportunities to recover leadership visibility and improve compliance during the next reporting period.\n- Where targets are missed, review documented justification in the monthly KPI process. Failure to provide suitable justification results in **Red**, irrespective of compliance monitoring performance.\n\n**Red**\n- Supervisor or HSE Adviser: less than 50% of expected visits during the month.\n- Site Manager: visit target not achieved within two continuous quarters, or more than two quarters in a rolling 12-month period.\n- **AND/OR** Level 4 compliance below 70%, significant non-conformances, repeat findings, or evidence that permit controls are ineffective at the worksite.\n- Immediate intervention: review justification, findings and corrective actions, and opportunities to recover leadership visibility and improve compliance during the next reporting period.\n\n**Asset visitation:** review over/under visiting by Site Managers. Where significant imbalances exist, target future visits proportionately to operational activity, risk profile and workforce exposure.")
         with cols[4]:
             if k5 and not (k5[13] or "").strip():st.warning("Incident Register source note missing; result needs validation. Any Red incident trigger remains visible.")
             k5_reason=("Incident severity or recurring-control criterion triggered" if k5s=="Red" else f"Increase from {prev} to {current}" if k5s=="Amber" and current>prev else "Incident warning criterion triggered" if k5s=="Amber" else "Source note needs validation" if k5s=="Needs review" else "No adverse incident trigger" if k5s=="Green" else "Incident Register summary needed")
             measure_card("KPI 5","Permit-Controlled Incidents","Rolling 12-month count",k5v,"Previous 12-month count",str(prev) if k5 else "—",k5s,k5_reason,"Synthetic UAT scenario" if k5_synthetic else "Company-wide Incident Register source required")
-            with st.popover("Open KPI 5 reports",use_container_width=True):
-                st.subheader("KPI 5 · Permit-controlled incidents")
-                st.caption("Company-wide incident source · "+period+" · independent of audit counts")
-                if k5:
-                    st.write(f"**Rolling 12 months:** {k5[4]} incidents · **Previous 12 months:** {k5[5]}")
-                    st.write(f"**HiPO:** {k5[6]} · **Significant injuries:** {k5[7]} · **Loss of containment:** {k5[8]} · **Major loss of containment:** {k5[9]}")
-                    st.write(f"**Repeat theme:** {k5[10]} · **Recurring control failure:** {k5[11]} · **Significant increase assessment:** {k5[12]}")
-                    st.markdown("**Source comments and leadership actions**")
-                    st.write(k5[13] or "Not recorded")
-                    st.caption("Record: "+str(k5[0])+" · Submitted: "+str(k5[1]))
-                else:
-                    st.info("No incident summary recorded for this reporting month.")
             with st.expander("KPI Targets & Tolerances"):
                 st.markdown("**Measure and target**\nReport incidents confirmed as occurring during permit-controlled activities over a **rolling 12-month period**, with identification of HiPOs, losses of containment and significant injuries (MTC or above). Use reviewed Incident Register records and the Incident Register tracking spreadsheet.\n\n**Green:** No increase in the rolling 12-month incident trend. No HiPOs, significant injuries (MTC or above), or repeat loss-of-containment events identified. No intervention required; continue monitoring and discussion through Monthly Operations and QSHE meetings.\n\n**Amber:** Increasing incident trend, a single HiPO, significant injury, loss of containment, or a repeat event theme identified within the reporting period. Operations Director intervention through targeted campaigns, assurance activities or focused reviews to address identified themes.\n\n**Red:** Significant increase in incidents, multiple HiPOs, significant injuries (MTC or above), major loss-of-containment events, or evidence of recurring failures in permit controls. Immediate General Manager intervention; investigation findings, learning actions and improvement measures implemented and tracked to closure.")
         @st.fragment
@@ -967,8 +1009,8 @@ def dashboard():
                 st.button("Open this step → "+step_view,key="open-presenter-step",on_click=open_walkthrough_step,type="primary")
                 st.caption("Close: Turn submitted audits into clear priorities, traceable evidence and a repeatable leadership report. Keep Improvement Scenario for questions at the end.")
             with st.container(border=True,key="dashboard-navigation"):
-                st.markdown("### Explore the assurance data")
-                st.caption("Start with insights → open a detailed KPI → review findings and owners → present the leadership report. All views use the month, asset and site selected above.")
+                st.markdown("### Explore your assurance data")
+                st.caption("Choose a view below. Every report follows the month, asset and site selected above.")
                 selected_view=st.radio("Choose a data view",["Assurance Insights","Detailed KPI Reports","Evidence Trail","Findings & Actions","Human Factors","Leadership Report","Improvement Scenario","Auditor View","Company & Site Performance","Monthly History","KPI 5 Data"],horizontal=True,key="dashboard-data-view",label_visibility="collapsed")
             st.markdown(f'<div class="active-view"><strong>Viewing: {html.escape(selected_view)}</strong><span>{md.strftime("%B %Y")} · {html.escape(asset)} · {html.escape(site)}</span></div>',unsafe_allow_html=True)
             evidence_groups={
