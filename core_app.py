@@ -746,7 +746,14 @@ def dashboard():
             cursor=date(cursor.year-1,12,1) if cursor.month==1 else date(cursor.year,cursor.month-1,1)
         ordered_months=sorted(known_months,reverse=True)
         initial_month=date(2026,10,1) if demo_mode else current_month
-        md=c1.selectbox("REPORTING MONTH",ordered_months,index=ordered_months.index(initial_month),format_func=lambda d:d.strftime("%B %Y"))
+        reporting_choice=c1.selectbox("REPORTING MONTH",["YTD Audits"]+ordered_months,index=ordered_months.index(initial_month)+1,format_func=lambda d:d if isinstance(d,str) else d.strftime("%B %Y"))
+        ytd_period_selected=reporting_choice=="YTD Audits"
+        if ytd_period_selected:
+            from datetime import timedelta
+            md=(current_month-timedelta(days=1)).replace(day=1)
+            st.session_state["dashboard-data-view"]="YTD Audits"
+        else:
+            md=reporting_choice
         asset=c2.selectbox("ASSET",["All","North","South"])
         asset_sites={"North":{"Site Alpha","Site Bravo","Site Charlie","North Remote Sites"},"South":{"Site Delta","Site Echo","South Remote Sites"}}
         y,m=md.year,md.month; period=md.strftime("%Y-%m"); month=[a for a in all_a if safe_date(a["audit_date"]) and date(y,m,1)<=safe_date(a["audit_date"])<=date(y,m,calendar.monthrange(y,m)[1])]
@@ -757,7 +764,7 @@ def dashboard():
         all_a=[a for a in all_a if a["site"] in asset_sites[asset]]
         month=[a for a in month if a["site"] in asset_sites[asset]]
     site="All" if site=="All assets and teams" else site
-    st.markdown(f'<div class="selection">{md.strftime("%B %Y")} &nbsp;·&nbsp; {html.escape("All assets and teams" if site=="All" else site)} &nbsp;·&nbsp; Monthly review</div>',unsafe_allow_html=True)
+    st.markdown(f'<div class="selection">{"YTD Audits · January–"+md.strftime("%B %Y") if ytd_period_selected else md.strftime("%B %Y")} &nbsp;·&nbsp; {html.escape("All assets and teams" if site=="All" else site)} &nbsp;·&nbsp; Monthly review</div>',unsafe_allow_html=True)
     selected_groups={g:v for g,v in SITE_GROUPS.items() if asset=="All" or g in asset_sites[asset]}
     headline_area=st.empty()
     headline_area.caption("Loading KPI evidence…")
