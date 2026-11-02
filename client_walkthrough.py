@@ -61,12 +61,12 @@ def snapshot(rows, statuses):
     st.caption('Selected reporting scope · Fictional demonstration · Checklist results describe the audit sample.')
 
 
-def evidence_trail(groups, period):
+def evidence_trail(groups, period, key_prefix="trail"):
     import streamlit as st
     import pandas as pd
     from human_factors import comment_records
     st.subheader('KPI → audit → finding → action')
-    label = st.selectbox('Choose a KPI evidence set', list(groups), key='trail-kpi')
+    label = st.selectbox('Choose a KPI evidence set', list(groups), key=key_prefix+'-kpi')
     rows = groups[label]
     st.caption('These are the contributing audit records. KPI 4 visit coverage and KPI 5 incident sources are reviewed in Detailed KPI Reports; audit counts do not replace those sources.')
     if not rows:
@@ -75,13 +75,13 @@ def evidence_trail(groups, period):
     register = [{'Audit ID': a['audit_id'], 'Date': a['audit_date'], 'Site': a['site'], 'Auditor': a['auditor'], 'No answers': sum(r.get('response') == 'No' for r in a['responses'])} for a in rows]
     st.dataframe(pd.DataFrame(register), hide_index=True, use_container_width=True)
     by_id = {a['audit_id']: a for a in rows}
-    aid = st.selectbox('Open an audit', list(by_id), format_func=lambda key: f"{key} · {by_id[key]['site']} · {by_id[key]['auditor']}", key='trail-audit-'+label)
+    aid = st.selectbox('Open an audit', list(by_id), format_func=lambda key: f"{key} · {by_id[key]['site']} · {by_id[key]['auditor']}", key=key_prefix+'-audit-'+label)
     audit = by_id[aid]
     st.markdown(f"#### {aid} · {audit['form_name']}")
     findings = [{'Ref': r.get('item', ''), 'BAR': r.get('bar_rating', ''), 'Question': r.get('question', ''), 'Evidence': r.get('comments_evidence', ''), 'Immediate action': r.get('immediate_action', ''), 'Required action': r.get('smart_action', ''), 'Owner': r.get('action_owner', ''), 'Due date': r.get('action_due_date', '')} for r in audit['responses'] if r.get('response') == 'No']
     if findings:
         st.dataframe(pd.DataFrame(findings), hide_index=True, use_container_width=True)
-        st.download_button('Download this audit’s findings', pd.DataFrame(findings).to_csv(index=False).encode('utf-8-sig'), f'{aid}_findings.csv', 'text/csv')
+        st.download_button('Download this audit’s findings', pd.DataFrame(findings).to_csv(index=False).encode('utf-8-sig'), f'{aid}_findings.csv', 'text/csv', key=key_prefix+'-download')
     else:
         st.success('No non-conformances recorded in this audit.')
     comments = [r for r in comment_records([audit]) if r['_themes']]
@@ -114,3 +114,11 @@ def improvement_scenario(groups):
     st.write(f'**90% conformance threshold:** {required} of {failed} non-conformant audits would need every No response corrected and verified, on this fixed sample.')
     st.write(f'**Scenario:** {passed+corrected}/{passed+failed} audits fully conformant, compared with {passed}/{passed+failed} recorded.')
     st.caption('A follow-up verification is assumed for illustration. Original audit results remain a historical record. This is a conformance-only scenario: missed delivery, visit coverage, source checks and incident measures can still prevent an overall Green KPI.')
+
+def evidence_popup(groups, period, key_prefix):
+    import streamlit as st
+    @st.fragment
+    def popup_body():
+        evidence_trail(groups, period, key_prefix=key_prefix)
+    popup_body()
+
