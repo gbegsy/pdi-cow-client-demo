@@ -745,11 +745,11 @@ def dashboard():
             known_months.add(cursor)
             cursor=date(cursor.year-1,12,1) if cursor.month==1 else date(cursor.year,cursor.month-1,1)
         ordered_months=sorted(known_months,reverse=True)
-        initial_month=date(2026,9,1) if demo_mode else current_month
+        initial_month=date(2026,10,1) if demo_mode else current_month
         md=c1.selectbox("REPORTING MONTH",ordered_months,index=ordered_months.index(initial_month),format_func=lambda d:d.strftime("%B %Y"))
         asset=c2.selectbox("ASSET",["All","North","South"])
         asset_sites={"North":{"Site Alpha","Site Bravo","Site Charlie","North Remote Sites"},"South":{"Site Delta","Site Echo","South Remote Sites"}}
-        y,m=md.year,md.month; period=md.strftime("%Y-%m"); month=[a for a in all_a if safe_date(a["audit_date"]) and reporting_weeks(y,m)[0]<=safe_date(a["audit_date"])<=date(y,m,calendar.monthrange(y,m)[1])]
+        y,m=md.year,md.month; period=md.strftime("%Y-%m"); month=[a for a in all_a if safe_date(a["audit_date"]) and date(y,m,1)<=safe_date(a["audit_date"])<=date(y,m,calendar.monthrange(y,m)[1])]
         sites=sorted(set(ASSET_GROUPS)|{a["site"] for a in month if a["site"]})
         if asset!="All": sites=[x for x in sites if x in asset_sites[asset]]
         site=c3.selectbox("SITE / HUB",["All assets and teams"]+sites,key=f"site-filter-{asset}")
@@ -1016,7 +1016,7 @@ def dashboard():
             with st.container(border=True,key="dashboard-navigation"):
                 st.markdown("### Explore your assurance data")
                 st.caption("Choose a view below. Every report follows the month, asset and site selected above.")
-                selected_view=st.radio("Choose a data view",["Assurance Insights","Detailed KPI Reports","Evidence Trail","Findings & Actions","Human Factors","Leadership Report","Improvement Scenario","Auditor View","Company & Site Performance","Monthly History","KPI 5 Data"],horizontal=True,key="dashboard-data-view",label_visibility="collapsed")
+                selected_view=st.radio("Choose a data view",["Assurance Insights","Detailed KPI Reports","Evidence Trail","Findings & Actions","Human Factors","Leadership Report","Improvement Scenario","Auditor View","Company & Site Performance","Monthly History","YTD Overview","KPI 5 Data"],horizontal=True,key="dashboard-data-view",label_visibility="collapsed")
             st.markdown(f'<div class="active-view"><strong>Viewing: {html.escape(selected_view)}</strong><span>{md.strftime("%B %Y")} · {html.escape(asset)} · {html.escape(site)}</span></div>',unsafe_allow_html=True)
             evidence_groups={
                 "KPI 1 · Site Controller":sc_samples,
@@ -1030,6 +1030,9 @@ def dashboard():
             if selected_view=="Improvement Scenario":
                 from client_walkthrough import improvement_scenario
                 improvement_scenario(evidence_groups)
+            if selected_view=="YTD Overview":
+                from ytd_views import render as render_ytd
+                render_ytd(all_a,y,m,asset,site)
             if selected_view=="Monthly History":
                 st.subheader("Monthly History")
                 dated=[(a,safe_date(a["audit_date"])) for a in all_a]
@@ -1254,7 +1257,7 @@ def dashboard():
 
 st.caption("**DEMO ONLY · Fictional data · Temporary session · Do not enter confidential information**")
 import importlib, demo_audits
-if demo_audits.SCENARIO != "september-conformance-75-83-hf-v3":
+if demo_audits.SCENARIO != "full-months-2026-jan-oct-v4":
     importlib.reload(demo_audits)
 demo_audits.prepare(db, DATA, SITE_GROUPS)
 st.sidebar.markdown("### PDi | VERIFY")
