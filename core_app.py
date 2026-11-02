@@ -736,10 +736,6 @@ def dashboard():
     global DB, DATABASE_URL, _SCHEMA_READY
     demo_mode=True
     all_a=[a for a in audits() if not a["audit_id"].startswith("DEMO-") and not a["metadata"].get("demo") and not a["metadata"].get("uat_sample")]
-    def show_ytd_period():
-        st.session_state["reporting-period"]="YTD Audits"
-        st.session_state["dashboard-data-view"]="YTD Audits"
-    st.button("YTD Audits",key="visible-ytd-period",on_click=show_ytd_period,type="primary",help="Open cumulative audits for all completed months this year.")
     with st.container(border=True,key="reporting-filters"):
         c1,c2,c3=st.columns([1,1,1.3])
         current_month=date.today().replace(day=1)
