@@ -1016,7 +1016,7 @@ def dashboard():
             with st.container(border=True,key="dashboard-navigation"):
                 st.markdown("### Explore your assurance data")
                 st.caption("Choose a view below. Every report follows the month, asset and site selected above.")
-                selected_view=st.radio("Choose a data view",["Assurance Insights","Detailed KPI Reports","Evidence Trail","Findings & Actions","Human Factors","Leadership Report","Improvement Scenario","Auditor View","Company & Site Performance","Monthly History","YTD Overview","KPI 5 Data"],horizontal=True,key="dashboard-data-view",label_visibility="collapsed")
+                selected_view=st.radio("Choose a data view",["Assurance Insights","Detailed KPI Reports","Evidence Trail","Findings & Actions","Human Factors","Leadership Report","Improvement Scenario","Auditor View","Company & Site Performance","Monthly History","YTD Overview","YTD Audits","KPI 5 Data"],horizontal=True,key="dashboard-data-view",label_visibility="collapsed")
             st.markdown(f'<div class="active-view"><strong>Viewing: {html.escape(selected_view)}</strong><span>{md.strftime("%B %Y")} · {html.escape(asset)} · {html.escape(site)}</span></div>',unsafe_allow_html=True)
             evidence_groups={
                 "KPI 1 · Site Controller":sc_samples,
@@ -1030,6 +1030,9 @@ def dashboard():
             if selected_view=="Improvement Scenario":
                 from client_walkthrough import improvement_scenario
                 improvement_scenario(evidence_groups)
+            if selected_view=="YTD Audits":
+                from ytd_views import render_cumulative
+                render_cumulative(all_a,y,m,asset,site)
             if selected_view=="YTD Overview":
                 from ytd_views import render as render_ytd
                 render_ytd(all_a,y,m,asset,site)
