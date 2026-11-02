@@ -50,6 +50,9 @@ def snapshot(rows, statuses):
                 st.write(finding.get('smart_action') or 'Not recorded')
                 st.caption(f"Owner: {finding.get('action_owner') or 'Unassigned'} · Due: {finding.get('action_due_date') or 'Not recorded'}")
         st.caption("A recorded action does not demonstrate that the control has been restored; check the verification evidence.")
+    st.markdown("**BAR — Barrier Assurance Review · What the levels mean**")
+    st.info("**BAR 1 · Critical control verification:** checks required controls against major accident or serious harm. A No requires immediate action to make work safe.\n\n**BAR 2 · Operational control:** checks planning, understanding, supervision and how work is carried out. A No requires correction and tracking.\n\n**BAR 3 · Management and learning:** checks oversight, records, lessons and improvement follow-up. A No requires an improvement action.")
+    st.caption("The BAR is assigned to the audit question. A No records a non-conformance; the BAR is not a separate risk score assigned to the finding. These demonstration classifications require client agreement.")
     st.write(f"**Performance:** Red: {red or 'None'} · Amber: {amber or 'None'}.")
     if failed:
         repeated = Counter(r.get('question', '') for _, r in failed)
