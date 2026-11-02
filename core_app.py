@@ -309,6 +309,17 @@ h2,h3,h4{color:#102d42;letter-spacing:-.35px}
 [data-testid="stSidebar"] label[data-selected="true"]>div>div:first-child{
  background-color:#147c87!important;border-color:#147c87!important
 }
+
+/* Readable demo typography and a visible leadership briefing. */
+[data-testid="stMain"] [data-testid="stMarkdownContainer"] p,
+[data-testid="stMain"] [data-testid="stWidgetLabel"] p{font-size:17px;line-height:1.6}
+[data-testid="stMain"] [data-testid="stCaptionContainer"] p{font-size:14px;line-height:1.5}
+[data-testid="stMetricLabel"] p{font-size:15px!important;white-space:normal}
+.st-key-dashboard-navigation [role="radiogroup"] label p{font-size:15px!important}
+.summary-label,.kt,.metric-label{font-size:12px!important}
+.summary-sub,.kd{font-size:14px!important}
+.st-key-leadership-briefing{background:#edf6f8;border:1px solid #9fc5ce!important;border-left:6px solid #147c87!important;border-radius:12px;padding:20px!important;margin:18px 0}
+.st-key-leadership-briefing h3{font-size:24px;margin-top:0}
 </style>
 """, unsafe_allow_html=True)
 
@@ -1179,15 +1190,21 @@ def dashboard():
                 else:
                     st.success("No negative assurance responses in this view.")
             if selected_view=="Assurance Insights":
-                st.markdown("**CoW Assurance Insights.** See what the audits found, which work-control checks need attention and what to do next."); c1,c2,c3=st.columns(3); c1.metric("Question conformance",format_percentage(q_conf(permit+tbt)),help="Yes answers divided by applicable Yes/No answers. N/A answers are excluded."); c2.metric("Permit whole-audit conformance",format_percentage(audit_conformance(permit,rounded=False)),help="Percentage of scored permit audits with no No answers. One No makes an audit non-conformant."); c3.metric("TBT/POP whole-audit conformance",format_percentage(audit_conformance(tbt,rounded=False)),help="Percentage of scored TBT/POP audits with no No answers.")
-                st.caption(checklist_compliance_basis(permit+tbt))
+                st.markdown("**CoW Assurance Insights.** See what all three audit types found, which work-control checks need attention and what to do next.")
+                insight_audits=permit+tbt+lead
+                st.metric("Question conformance · all three audit types",format_percentage(q_conf(insight_audits)),help="Yes answers divided by applicable Yes/No answers across permit, TBT/POP and Leadership CoW Engagement audits. N/A answers are excluded.")
+                c1,c2,c3=st.columns(3)
+                for column,label,records in [(c1,"Permit Quality",permit),(c2,"TBT / Permit Compliance / Operating Procedures",tbt),(c3,"Leadership CoW Engagement",lead)]:
+                    column.metric(label,format_percentage(audit_conformance(records,rounded=False)),help="Whole-audit conformance: percentage of scored audits with no No answers. N/A answers are excluded.")
+                    column.caption(f"{len(records)} audits · whole-audit conformance")
+                st.caption(checklist_compliance_basis(insight_audits))
                 with st.expander("How to read these results"):
                     st.write("Question conformance measures individual Yes/No answers. Whole-audit conformance is the percentage of scored audits with no No answers. N/A answers are excluded. Themes group the failed checks; they do not establish causes or the condition of every barrier. Displayed percentages round upwards; RAG uses unrounded values.")
                 st.markdown("#### What needs attention")
-                st.info(nonconformance_narrative(permit+tbt))
+                st.info(nonconformance_narrative(insight_audits))
                 with st.expander("Controls verified by Yes responses",expanded=False):
                     st.markdown("#### Controls verified by Yes responses")
-                    positives=[{"Date":a["audit_date"],"Site / Team":a["site"],"Audit ID":a["audit_id"],"Question":r.get("question",""),"Ref":r.get("item","")} for a in permit+tbt for r in a["responses"] if str(r.get("response","")).lower()=="yes"]
+                    positives=[{"Date":a["audit_date"],"Site / Team":a["site"],"Audit ID":a["audit_id"],"Question":r.get("question",""),"Ref":r.get("item","")} for a in insight_audits for r in a["responses"] if str(r.get("response","")).lower()=="yes"]
                     if positives: st.dataframe(pd.DataFrame(positives),use_container_width=True,hide_index=True)
                     else: st.caption("No controls verified by a Yes response in the selected view.")
                     st.caption("Yes confirms checklist conformance; it does not by itself demonstrate exceptional practice. Non-conformances and actions remain the priority.")
