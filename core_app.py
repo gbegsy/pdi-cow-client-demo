@@ -1037,8 +1037,8 @@ def dashboard():
                 st.caption("Close: Turn submitted audits into clear priorities, traceable evidence and a repeatable leadership report. Keep Improvement Scenario for questions at the end.")
             with st.container(border=True,key="dashboard-navigation"):
                 st.markdown("### Explore your assurance data")
-                st.caption("Choose a view below. Every report follows the month, asset and site selected above.")
-                selected_view=st.radio("Choose a data view",["Assurance Insights","Detailed KPI Reports","Evidence Trail","Findings & Actions","Human Factors","Leadership Report","Improvement Scenario","Auditor View","Company & Site Performance","Monthly History","YTD Overview","YTD Audits","KPI 5 Data"],horizontal=True,key="dashboard-data-view",label_visibility="collapsed")
+                st.caption("Overview & trends → audit detail → findings & evidence → leadership & improvement. Monthly views follow the selected filters; YTD views use completed months.")
+                selected_view=st.radio("Choose a data view",["Assurance Insights","Company & Site Performance","Monthly History","YTD Overview","YTD Audits","Detailed KPI Reports","Auditor View","Findings & Actions","Evidence Trail","Human Factors","KPI 5 Data","Leadership Report","Improvement Scenario"],horizontal=True,key="dashboard-data-view",label_visibility="collapsed")
             st.markdown(f'<div class="active-view"><strong>Viewing: {html.escape(selected_view)}</strong><span>{md.strftime("%B %Y")} · {html.escape(asset)} · {html.escape(site)}</span></div>',unsafe_allow_html=True)
             evidence_groups={
                 "KPI 1 · Site Controller":sc_samples,
