@@ -91,8 +91,29 @@ def leadership_narrative(audits, period):
 def render_leadership_narrative(audits, period, key="hf-leadership"):
     import streamlit as st
     text = leadership_narrative(audits, period)
-    st.markdown("#### Human Factors · Leadership narrative")
-    st.markdown(text)
+    from html import escape
+    sections=[]
+    for paragraph in text.split("\n\n"):
+        plain=paragraph.replace("**","")
+        label,separator,body=plain.partition(":")
+        content=(f"<strong>{escape(label)}:</strong>{escape(body)}" if separator else escape(plain))
+        if plain.startswith("Leadership follow-up"):
+            sections.append('<div class="hf-follow-up">'+content+'</div>')
+        elif plain.startswith(("Evidence base","Interpretation")):
+            sections.append('<p class="hf-support">'+content+'</p>')
+        else:
+            sections.append('<p>'+content+'</p>')
+    st.markdown("""
+    <style>
+    .hf-narrative-card{background:#fff;border:1px solid #cadbe4;border-left:5px solid #147c87;border-radius:12px;padding:24px 28px;margin:14px 0 18px;box-shadow:0 3px 12px #102d4208}
+    .hf-narrative-card h3{font-size:23px;margin:0 0 18px;color:#102d42}
+    .hf-narrative-card p{max-width:1000px;font-size:17px!important;line-height:1.7!important;margin:0 0 18px}
+    .hf-narrative-card .hf-support{font-size:14px!important;color:#536b7c;line-height:1.6!important}
+    .hf-narrative-card .hf-follow-up{max-width:1000px;background:#eaf5f5;border-left:4px solid #147c87;border-radius:7px;padding:17px 20px;margin:20px 0;font-size:17px;line-height:1.7}
+    .hf-narrative-card .hf-support:last-child{margin-bottom:0}
+    @media(max-width:650px){.hf-narrative-card{padding:18px}.hf-narrative-card .hf-follow-up{padding:14px}}
+    </style>
+    """+'<section class="hf-narrative-card" aria-label="Human Factors leadership narrative"><h3>Human Factors · Leadership narrative</h3>'+"".join(sections)+'</section>',unsafe_allow_html=True)
     with st.expander("Source examples behind this narrative"):
         rows = comment_records(audits)
         seen = set()
