@@ -1196,6 +1196,12 @@ def dashboard():
                 st.markdown('### Neo: “I know kung fu.” Garry: “I know code.”')
                 st.write('AI has helped me turn operational assurance experience into a working application. I bring the standards, questions and operational judgement; AI helps translate those requirements into code.')
                 st.info('The real test is whether it works: check the calculations, inspect the evidence and challenge the results.')
+                with st.container(border=True):
+                    st.markdown('### PDi PREVENT · Turn insight into prevention')
+                    st.write('Set clear expectations, involve the people doing the work, and make it practical to work safely. Use what assurance reveals to strengthen planning, conversations and controls before the next task.')
+                    st.markdown('**PREVENT:** establish expectations and support safe work.\n\n**VERIFY:** check how those expectations translate into practice, inspect the evidence and identify where follow-up is needed.')
+                    st.caption('The connection: operational knowledge + AI-assisted development → clearer assurance insight → practical prevention. This demo illustrates the approach; it is not an automated PREVENT integration.')
+
             if selected_view=="Mine the Diamond":
                 from diamond_insights import render as render_diamond
                 render_diamond(permit+tbt+lead,period)
