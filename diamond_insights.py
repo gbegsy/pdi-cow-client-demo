@@ -2,10 +2,11 @@
 import re
 from collections import Counter
 
-QUESTIONS = ['What needs leadership attention?', 'Where are the BAR 1 non-conformances?', 'Which checks repeatedly fail?', 'How do the three audit types compare?', 'What do the HF comments reveal?', 'Search the audit evidence']
+QUESTIONS = ['What needs leadership attention?', 'Where are the BAR 1 non-conformances?', 'Which checks repeatedly fail?', 'How do the three audit types compare?', 'What do the HF comments reveal?', 'Search the audit evidence', 'How many audits were completed?']
 
 def query_mode(text):
     value=text.lower()
+    if re.search(r'how many|number of audits|audit count|total audits|count.*audits',value): return QUESTIONS[6]
     if re.search(r'\b(hf|human factors|comments?|handover|workload)\b', value): return QUESTIONS[4]
     if re.search(r'bar\s*1|critical',value): return QUESTIONS[1]
     if re.search(r'repeat|recurr|frequen',value): return QUESTIONS[2]
@@ -49,10 +50,26 @@ def render(audits,period):
     if submitted: st.session_state['diamond-request']=(choice,query)
     choice,query=st.session_state.get('diamond-request',(QUESTIONS[0],''))
     mode=query_mode(query) if query.strip() else choice
+    import calendar
+    requested_months={i for i in range(1,13) if re.search(r'\b'+calendar.month_name[i].lower()+r'\b',query.lower())}
+    selected_month=int(period[5:7])
+    if requested_months and requested_months!={selected_month}:
+        st.warning('Your question names a different month. Change Reporting Month above to '+', '.join(calendar.month_name[i] for i in sorted(requested_months))+' and submit again. This assistant only uses the selected reporting scope.')
+        return
     st.markdown('### '+mode)
     if query.strip(): st.caption('Matched analysis: '+mode+' · For site-specific answers, set the Site / Hub filter above. Use evidence search for exact words or IDs.')
     if not audits:
         st.info('No audits in this reporting scope. Change the reporting filters to explore available evidence.')
+        return
+    if mode==QUESTIONS[6]:
+        st.metric('Audits completed · '+calendar.month_name[selected_month]+' '+period[:4],len(audits))
+        counts=Counter(a.get('form_name','Unknown') for a in audits)
+        st.dataframe(pd.DataFrame([{'Audit type':name,'Audits completed':count} for name,count in counts.items()]),hide_index=True,use_container_width=True)
+        st.caption('Count includes all three audit types within the selected month, asset and site. It is an audit count, not a count of answered questions.')
+        with st.expander('Show the contributing audits'):
+            register=pd.DataFrame([{'Audit ID':a.get('audit_id',''),'Date':a.get('audit_date',''),'Audit type':a.get('form_name',''),'Site / Team':a.get('site',''),'Auditor':a.get('auditor','')} for a in audits])
+            st.dataframe(register,hide_index=True,use_container_width=True)
+            st.download_button('Download audit count evidence',register.to_csv(index=False).encode('utf-8-sig'),'CoW_Audit_Count_'+period+'.csv','text/csv',key='diamond-count-download')
         return
     failed=findings(audits)
     critical=[p for p in failed if p[1].get('bar_rating')=='BAR 1']
