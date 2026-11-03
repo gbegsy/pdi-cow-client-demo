@@ -1214,6 +1214,8 @@ def dashboard():
                     column.metric(label,format_percentage(audit_conformance(records,rounded=False)),help="Whole-audit conformance: percentage of scored audits with no No answers. N/A answers are excluded.")
                     column.caption(f"{len(records)} audits · whole-audit conformance")
                 st.caption(checklist_compliance_basis(insight_audits))
+                from safety_staircase import render as render_safety_staircase
+                render_safety_staircase(insight_audits,period)
                 with st.expander("How to read these results"):
                     st.write("Question conformance measures individual Yes/No answers. Whole-audit conformance is the percentage of scored audits with no No answers. N/A answers are excluded. Themes group the failed checks; they do not establish causes or the condition of every barrier. Displayed percentages round upwards; RAG uses unrounded values.")
                 st.markdown("#### What needs attention")
