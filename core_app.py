@@ -1040,7 +1040,7 @@ def dashboard():
                 st.caption("Overview & trends → audit detail → findings & evidence → leadership & improvement. Monthly views follow the selected filters; YTD views use completed months.")
                 if st.session_state.get("dashboard-data-view")=="Improvement Scenario":
                     st.session_state["dashboard-data-view"]="Assurance Insights"
-                selected_view=st.radio("Choose a data view",["Assurance Insights","Mine the Diamond","Company & Site Performance","Monthly History","YTD Overview","YTD Audits","Detailed KPI Reports","Auditor View","Findings & Actions","Evidence Trail","Human Factors","KPI 5 Data","Leadership Report","Behind the demo"],horizontal=True,key="dashboard-data-view",label_visibility="collapsed")
+                selected_view=st.radio("Choose a data view",["Assurance Insights","Mine the Diamond","Company & Site Performance","Monthly History","YTD Overview","YTD Audits","Detailed KPI Reports","Auditor View","Findings & Actions","Evidence Trail","Human Factors","KPI 5 Data","Leadership Report","PDi HSEQ Ecosystem","Behind the demo"],horizontal=True,key="dashboard-data-view",label_visibility="collapsed")
             st.markdown(f'<div class="active-view"><strong>Viewing: {html.escape(selected_view)}</strong><span>{md.strftime("%B %Y")} · {html.escape(asset)} · {html.escape(site)}</span></div>',unsafe_allow_html=True)
             evidence_groups={
                 "KPI 1 · Site Controller":sc_samples,
@@ -1188,6 +1188,24 @@ def dashboard():
                     st.dataframe(repeat_df,use_container_width=True,hide_index=True)
                 else:
                     st.success("No negative assurance responses in this view.")
+            if selected_view=="PDi HSEQ Ecosystem":
+                st.subheader('PDi HSEQ Ecosystem')
+                st.write('Connect prevention, learning, assurance and culture to support better operational decisions.')
+                ecosystem=[
+                    ('PREVENT','Set expectations · Support safe work','Turn standards into practical planning, clear conversations and effective controls before work starts.','#147c87'),
+                    ('DISCOVER','Learn from experience','Use observations, findings and investigations to understand what happened and identify improvements.','#5367a0'),
+                    ('VERIFY','Check the evidence','Test whether requirements and controls are being met. Make gaps, accountable actions and follow-up visible.','#102f4b'),
+                    ('PULSE','Listen · Understand culture','Explore workforce experience and cultural maturity to identify where leadership support and improvement are needed.','#86619c'),
+                ]
+                for row_start in (0,2):
+                    columns=st.columns(2)
+                    for column,(name,tagline,description,colour) in zip(columns,ecosystem[row_start:row_start+2]):
+                        with column:
+                            st.markdown(f'<div style="background:white;border:1px solid #cbdce5;border-top:6px solid {colour};border-radius:12px;padding:24px;min-height:220px;margin-bottom:16px"><span style="font-size:13px;font-weight:800;letter-spacing:1px;color:{colour}">PDi | {name}</span><h3 style="font-size:23px;margin:12px 0">{tagline}</h3><p style="font-size:17px;line-height:1.6">{description}</p></div>',unsafe_allow_html=True)
+                st.info('The learning loop: set expectations → learn from work → verify controls → listen to people → strengthen prevention.')
+                st.markdown('### Where this CoW demo fits')
+                st.write('This is VERIFY in practice: submitted audits feed KPI reporting, BAR findings, accountable actions and leadership insight. Those insights can inform PREVENT activity, DISCOVER learning and PULSE conversations.')
+                st.caption('Ecosystem overview · Connections describe the approach; separate products are not automatically integrated in this demonstration.')
             if selected_view=="Behind the demo":
                 import base64
                 st.subheader('Behind the demo · I know code')
