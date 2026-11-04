@@ -1358,7 +1358,7 @@ st.sidebar.markdown("### PDi | VERIFY")
 st.sidebar.caption("Control of Work assurance · Demo")
 with st.sidebar.expander("About this demonstration"):
     st.write("All sites, people, audits and incidents are fictional. Sample KPI targets and BAR classifications require client agreement before operational use. Failed checks are deliberately concentrated in a minority of audits to demonstrate question and whole-audit conformance around 75–83%. Data is temporary and isolated for this session.")
-page=st.sidebar.radio("Navigation",["Dashboard","Permit Quality","Toolbox Talk / Permit / POP","Leadership Engagement","Submitted Audits","Dashboard Export"],label_visibility="collapsed")
+page=st.sidebar.radio("Navigation",["Dashboard","Toolbox Talk / Permit / POP","Permit Quality","Leadership Engagement","Submitted Audits","Dashboard Export"],label_visibility="collapsed")
 
 if page=="Dashboard": dashboard()
 elif page=="Permit Quality":
