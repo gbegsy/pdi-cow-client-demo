@@ -1040,7 +1040,9 @@ def dashboard():
                 st.caption("Overview & trends → audit detail → findings & evidence → leadership & improvement. Monthly views follow the selected filters; YTD views use completed months.")
                 if st.session_state.get("dashboard-data-view")=="Improvement Scenario":
                     st.session_state["dashboard-data-view"]="Assurance Insights"
-                selected_view=st.radio("Choose a data view",["Assurance Insights","Mine the Diamond","Company & Site Performance","Monthly History","YTD Overview","YTD Audits","Detailed KPI Reports","Auditor View","Findings & Actions","Evidence Trail","Human Factors","KPI 5 Data","Leadership Report","PDi HSEQ Ecosystem","Behind the demo"],horizontal=True,key="dashboard-data-view",label_visibility="collapsed")
+                if st.session_state.get("dashboard-data-view") in ("PDi HSEQ Ecosystem","Behind the demo"):
+                    st.session_state["dashboard-data-view"]="Assurance Insights"
+                selected_view=st.radio("Choose a data view",["Assurance Insights","Mine the Diamond","Company & Site Performance","Monthly History","YTD Overview","YTD Audits","Detailed KPI Reports","Auditor View","Findings & Actions","Evidence Trail","Human Factors","KPI 5 Data","Leadership Report"],horizontal=True,key="dashboard-data-view",label_visibility="collapsed")
             st.markdown(f'<div class="active-view"><strong>Viewing: {html.escape(selected_view)}</strong><span>{md.strftime("%B %Y")} · {html.escape(asset)} · {html.escape(site)}</span></div>',unsafe_allow_html=True)
             evidence_groups={
                 "KPI 1 · Site Controller":sc_samples,
@@ -1188,62 +1190,6 @@ def dashboard():
                     st.dataframe(repeat_df,use_container_width=True,hide_index=True)
                 else:
                     st.success("No negative assurance responses in this view.")
-            if selected_view=="PDi HSEQ Ecosystem":
-                st.subheader('PDi HSEQ Ecosystem')
-                st.write('Connect prevention, learning, assurance and culture to support better operational decisions.')
-                st.markdown("""
-                <style>
-                .eco-loop{background:#fff;border:1px solid #cbdce5;border-radius:16px;padding:26px;margin:20px 0}
-                .eco-loop-title{text-align:center;font-size:22px;font-weight:800;color:#102f4b;margin-bottom:22px}
-                .eco-loop-track{display:flex;align-items:center;justify-content:center;gap:12px}
-                .eco-loop-node{flex:1;text-align:center;border-radius:12px;background:var(--eco);padding:22px 12px;color:white;min-width:0}
-                .eco-loop-node strong{display:block;font-size:22px;letter-spacing:.5px}
-                .eco-loop-node span{display:block;font-size:15px;margin-top:9px;line-height:1.45}
-                .eco-loop-arrow{font-size:27px;color:#657d8d}
-                .eco-loop-return{text-align:center;border-top:2px solid #aecbd1;margin:22px 14px 0;padding-top:15px;font-size:16px;color:#147c87;font-weight:700}
-                @media(max-width:700px){.eco-loop-track{flex-direction:column}.eco-loop-node{width:100%;box-sizing:border-box}.eco-loop-arrow{transform:rotate(90deg)}.eco-loop{padding:18px}}
-                </style>
-                <div class="eco-loop" role="img" aria-label="PDi HSEQ ecosystem: PREVENT sets expectations, DISCOVER learns from work, VERIFY checks controls, PULSE listens to people. Learning strengthens prevention.">
-                  <div class="eco-loop-title">PDi HSEQ · One connected learning loop</div>
-                  <div class="eco-loop-track">
-                    <div class="eco-loop-node" style="--eco:#147c87"><strong>PREVENT</strong><span>Set expectations</span></div>
-                    <span class="eco-loop-arrow" aria-hidden="true">→</span>
-                    <div class="eco-loop-node" style="--eco:#5367a0"><strong>DISCOVER</strong><span>Learn from work</span></div>
-                    <span class="eco-loop-arrow" aria-hidden="true">→</span>
-                    <div class="eco-loop-node" style="--eco:#102f4b"><strong>VERIFY</strong><span>Check controls</span></div>
-                    <span class="eco-loop-arrow" aria-hidden="true">→</span>
-                    <div class="eco-loop-node" style="--eco:#86619c"><strong>PULSE</strong><span>Listen to people</span></div>
-                  </div>
-                  <div class="eco-loop-return">↶ Learning and insight strengthen prevention</div>
-                </div>
-                """,unsafe_allow_html=True)
-
-                ecosystem=[
-                    ('PREVENT','Set expectations · Support safe work','Turn standards into practical planning, clear conversations and effective controls before work starts.','#147c87'),
-                    ('DISCOVER','Learn from experience','Use observations, findings and investigations to understand what happened and identify improvements.','#5367a0'),
-                    ('VERIFY','Check the evidence','Test whether requirements and controls are being met. Make gaps, accountable actions and follow-up visible.','#102f4b'),
-                    ('PULSE','Listen · Understand culture','Explore workforce experience and cultural maturity to identify where leadership support and improvement are needed.','#86619c'),
-                ]
-                for row_start in (0,2):
-                    columns=st.columns(2)
-                    for column,(name,tagline,description,colour) in zip(columns,ecosystem[row_start:row_start+2]):
-                        with column:
-                            st.markdown(f'<div style="background:white;border:1px solid #cbdce5;border-top:6px solid {colour};border-radius:12px;padding:24px;min-height:220px;margin-bottom:16px"><span style="font-size:13px;font-weight:800;letter-spacing:1px;color:{colour}">PDi | {name}</span><h3 style="font-size:23px;margin:12px 0">{tagline}</h3><p style="font-size:17px;line-height:1.6">{description}</p></div>',unsafe_allow_html=True)
-                st.info('The learning loop: set expectations → learn from work → verify controls → listen to people → strengthen prevention.')
-                st.markdown('### Where this CoW demo fits')
-                st.write('This is VERIFY in practice: submitted audits feed KPI reporting, BAR findings, accountable actions and leadership insight. Those insights can inform PREVENT activity, DISCOVER learning and PULSE conversations.')
-                st.caption('Ecosystem overview · Connections describe the approach; separate products are not automatically integrated in this demonstration.')
-            if selected_view=="Behind the demo":
-                st.subheader('Behind the demo · How it was built')
-                st.caption('A short presenter story about AI-assisted development.')
-                st.write('AI has helped me turn operational assurance experience into a working application. I bring the standards, questions and operational judgement; AI helps translate those requirements into code.')
-                st.info('The real test is whether it works: check the calculations, inspect the evidence and challenge the results.')
-                with st.container(border=True):
-                    st.markdown('### PDi PREVENT · Turn insight into prevention')
-                    st.write('Set clear expectations, involve the people doing the work, and make it practical to work safely. Use what assurance reveals to strengthen planning, conversations and controls before the next task.')
-                    st.markdown('**PREVENT:** establish expectations and support safe work.\n\n**VERIFY:** check how those expectations translate into practice, inspect the evidence and identify where follow-up is needed.')
-                    st.caption('The connection: operational knowledge + AI-assisted development → clearer assurance insight → practical prevention. This demo illustrates the approach; it is not an automated PREVENT integration.')
-
             if selected_view=="Mine the Diamond":
                 from diamond_insights import render as render_diamond
                 render_diamond(permit+tbt+lead,period)
