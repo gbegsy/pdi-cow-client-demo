@@ -1228,7 +1228,7 @@ def dashboard():
                 insight_audits=permit+tbt+lead
                 st.metric("Question conformance · all three audit types",format_percentage(q_conf(insight_audits)),help="Yes answers divided by applicable Yes/No answers across permit, TBT/POP and Leadership CoW Engagement audits. N/A answers are excluded.")
                 c1,c2,c3=st.columns(3)
-                for column,label,records in [(c1,"Permit Quality",permit),(c2,"TBT / Permit Compliance / Operating Procedures",tbt),(c3,"Leadership CoW Engagement",lead)]:
+                for column,label,records in [(c1,"TBT / Permit Compliance / Operating Procedures",tbt),(c2,"Permit Quality",permit),(c3,"Leadership CoW Engagement",lead)]:
                     column.metric(label,format_percentage(audit_conformance(records,rounded=False)),help="Whole-audit conformance: percentage of scored audits with no No answers. N/A answers are excluded.")
                     column.caption(f"{len(records)} audits · whole-audit conformance")
                 st.caption(checklist_compliance_basis(insight_audits))
