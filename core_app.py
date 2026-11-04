@@ -1191,6 +1191,33 @@ def dashboard():
             if selected_view=="PDi HSEQ Ecosystem":
                 st.subheader('PDi HSEQ Ecosystem')
                 st.write('Connect prevention, learning, assurance and culture to support better operational decisions.')
+                st.markdown("""
+                <style>
+                .eco-loop{background:#fff;border:1px solid #cbdce5;border-radius:16px;padding:26px;margin:20px 0}
+                .eco-loop-title{text-align:center;font-size:22px;font-weight:800;color:#102f4b;margin-bottom:22px}
+                .eco-loop-track{display:flex;align-items:center;justify-content:center;gap:12px}
+                .eco-loop-node{flex:1;text-align:center;border-radius:12px;background:var(--eco);padding:22px 12px;color:white;min-width:0}
+                .eco-loop-node strong{display:block;font-size:22px;letter-spacing:.5px}
+                .eco-loop-node span{display:block;font-size:15px;margin-top:9px;line-height:1.45}
+                .eco-loop-arrow{font-size:27px;color:#657d8d}
+                .eco-loop-return{text-align:center;border-top:2px solid #aecbd1;margin:22px 14px 0;padding-top:15px;font-size:16px;color:#147c87;font-weight:700}
+                @media(max-width:700px){.eco-loop-track{flex-direction:column}.eco-loop-node{width:100%;box-sizing:border-box}.eco-loop-arrow{transform:rotate(90deg)}.eco-loop{padding:18px}}
+                </style>
+                <div class="eco-loop" role="img" aria-label="PDi HSEQ ecosystem: PREVENT sets expectations, DISCOVER learns from work, VERIFY checks controls, PULSE listens to people. Learning strengthens prevention.">
+                  <div class="eco-loop-title">PDi HSEQ · One connected learning loop</div>
+                  <div class="eco-loop-track">
+                    <div class="eco-loop-node" style="--eco:#147c87"><strong>PREVENT</strong><span>Set expectations</span></div>
+                    <span class="eco-loop-arrow" aria-hidden="true">→</span>
+                    <div class="eco-loop-node" style="--eco:#5367a0"><strong>DISCOVER</strong><span>Learn from work</span></div>
+                    <span class="eco-loop-arrow" aria-hidden="true">→</span>
+                    <div class="eco-loop-node" style="--eco:#102f4b"><strong>VERIFY</strong><span>Check controls</span></div>
+                    <span class="eco-loop-arrow" aria-hidden="true">→</span>
+                    <div class="eco-loop-node" style="--eco:#86619c"><strong>PULSE</strong><span>Listen to people</span></div>
+                  </div>
+                  <div class="eco-loop-return">↶ Learning and insight strengthen prevention</div>
+                </div>
+                """,unsafe_allow_html=True)
+
                 ecosystem=[
                     ('PREVENT','Set expectations · Support safe work','Turn standards into practical planning, clear conversations and effective controls before work starts.','#147c87'),
                     ('DISCOVER','Learn from experience','Use observations, findings and investigations to understand what happened and identify improvements.','#5367a0'),
