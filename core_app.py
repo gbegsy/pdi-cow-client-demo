@@ -66,7 +66,7 @@ class DatabaseConnection:
         self.connection.close()
 
 
-st.set_page_config(page_title="PDi Demo - Control of Work Assurance", page_icon="🔒", layout="wide")
+st.set_page_config(page_title="PDi Demo V2 - Control of Work Assurance", page_icon="🔒", layout="wide")
 st.markdown("""
 <style>
 .block-container{max-width:1450px;min-width:0;box-sizing:border-box;padding-top:1.5rem;padding-bottom:3rem}
@@ -742,7 +742,7 @@ def recovery_actions(period, scope, kpi_filter=None):
 
 
 def dashboard():
-    st.markdown(f'<div class="dash"><div class="brand-row"><strong style="font-size:25px">PDi | VERIFY</strong><div class="eyebrow">PDi DEMO | OPERATIONAL ASSURANCE</div></div><h1>Control of Work Assurance</h1><p>From audit evidence to clear leadership decisions.</p><span class="demo-chip">CLIENT DEMONSTRATION · FICTIONAL DATA</span></div>',unsafe_allow_html=True)
+    st.markdown(f'<div class="dash"><div class="brand-row"><strong style="font-size:25px">PDi | VERIFY</strong><div class="eyebrow">PDi DEMO V2 | OPERATIONAL ASSURANCE</div></div><h1>Control of Work Assurance</h1><p>From audit evidence to clear leadership decisions.</p><span class="demo-chip">CLIENT DEMONSTRATION · FICTIONAL DATA</span></div>',unsafe_allow_html=True)
 
     global DB, DATABASE_URL, _SCHEMA_READY
     demo_mode=True
@@ -1234,13 +1234,8 @@ def dashboard():
                 st.write('This is VERIFY in practice: submitted audits feed KPI reporting, BAR findings, accountable actions and leadership insight. Those insights can inform PREVENT activity, DISCOVER learning and PULSE conversations.')
                 st.caption('Ecosystem overview · Connections describe the approach; separate products are not automatically integrated in this demonstration.')
             if selected_view=="Behind the demo":
-                import base64
-                st.subheader('Behind the demo · I know code')
+                st.subheader('Behind the demo · How it was built')
                 st.caption('A short presenter story about AI-assisted development.')
-                neo_data=(BASE/'assets'/'neo-morpheus.jpg.b64').read_text().strip()
-                st.markdown(f'<img src="data:image/jpeg;base64,{neo_data}" alt="Neo and Morpheus sparring in the training dojo" style="display:block;width:100%;max-width:1000px;height:auto;border-radius:12px;margin:16px auto" />',unsafe_allow_html=True)
-                st.caption('Original AI-generated illustration of Neo and Morpheus training in a dojo.')
-                st.markdown('### Neo: “I know kung fu.” Garry: “I know code.”')
                 st.write('AI has helped me turn operational assurance experience into a working application. I bring the standards, questions and operational judgement; AI helps translate those requirements into code.')
                 st.info('The real test is whether it works: check the calculations, inspect the evidence and challenge the results.')
                 with st.container(border=True):
