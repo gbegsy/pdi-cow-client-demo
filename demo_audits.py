@@ -142,3 +142,25 @@ def prepare_full_months(db):
         c.execute("INSERT INTO kpi5 VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)",(prefix+'KPI5',str(month_end)+'T12:00:00',period,'All',12,10,0,1,1,0,'No','No','No','FICTIONAL DEMO: full-month incident summary; rolling 12-month values are snapshots and must not be summed across months. Twelve versus ten incidents, one MTC and one LOC. No live Incident Register source.',0))
         c.execute("INSERT INTO kpi_recovery_actions VALUES(?,?,?,?,?,?,?,?,?,?,?)",(prefix+'ACTION',period,'All / All','KPI 1','Demo Action Owner','','Review missed sampling, agree accountable actions and verify improvements.',str(month_end+timedelta(days=15)),'Open','',json.dumps([dict(source_reference=prefix+'sampling',at=str(month_end))])))
     c.commit();c.close()
+    prepare_fully_conformant_auditor(db)
+
+
+def prepare_fully_conformant_auditor(db):
+    """Give five existing conformant samples per month a distinct fictional auditor."""
+    c=db()
+    for month in range(1,11):
+        period=f"2026-{month:02d}"
+        if c.execute("SELECT COUNT(*) FROM audits WHERE auditor=? AND audit_date LIKE ?",('Demo Assurance Lead',period+'%')).fetchone()[0]:
+            continue
+        candidates=c.execute("SELECT audit_id,metadata,responses FROM audits WHERE auditor=? AND audit_date LIKE ? ORDER BY audit_date,audit_id",('Demo Site Controller',period+'%')).fetchall()
+        chosen=[]
+        for aid,metadata,responses in candidates:
+            answers=[r.get('response') for r in json.loads(responses) if r.get('response') in ('Yes','No')]
+            if answers and 'No' not in answers:
+                chosen.append((aid,metadata))
+            if len(chosen)==5: break
+        for aid,metadata in chosen:
+            meta=json.loads(metadata or '{}')
+            meta['auditor']='Demo Assurance Lead'
+            c.execute("UPDATE audits SET auditor=?,metadata=? WHERE audit_id=?",('Demo Assurance Lead',json.dumps(meta),aid))
+    c.commit();c.close()
