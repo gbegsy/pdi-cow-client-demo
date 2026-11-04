@@ -1237,7 +1237,9 @@ def dashboard():
                 import base64
                 st.subheader('Behind the demo · I know code')
                 st.caption('A short presenter story about AI-assisted development.')
-                st.image(base64.b64decode((BASE/'assets'/'neo-morpheus.jpg.b64').read_text()),caption='Original AI-generated illustration of Neo and Morpheus training in a dojo.',use_container_width=True)
+                neo_data=(BASE/'assets'/'neo-morpheus.jpg.b64').read_text().strip()
+                st.markdown(f'<img src="data:image/jpeg;base64,{neo_data}" alt="Neo and Morpheus sparring in the training dojo" style="display:block;width:100%;max-width:1000px;height:auto;border-radius:12px;margin:16px auto" />',unsafe_allow_html=True)
+                st.caption('Original AI-generated illustration of Neo and Morpheus training in a dojo.')
                 st.markdown('### Neo: “I know kung fu.” Garry: “I know code.”')
                 st.write('AI has helped me turn operational assurance experience into a working application. I bring the standards, questions and operational judgement; AI helps translate those requirements into code.')
                 st.info('The real test is whether it works: check the calculations, inspect the evidence and challenge the results.')
